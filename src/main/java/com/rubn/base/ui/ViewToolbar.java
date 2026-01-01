@@ -9,6 +9,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
+
 public final class ViewToolbar extends Composite<HorizontalLayout> {
 
     public ViewToolbar(@Nullable String viewTitle, Component... components) {
@@ -37,7 +39,10 @@ public final class ViewToolbar extends Composite<HorizontalLayout> {
     }
 
     public static Component group(Component... components) {
-        var group = new HorizontalLayout(components);
+        HorizontalLayout group = new HorizontalLayout();
+        if(Objects.nonNull(components)) {
+            group.add(components);
+        }
         group.setWrap(true);
         return group;
     }

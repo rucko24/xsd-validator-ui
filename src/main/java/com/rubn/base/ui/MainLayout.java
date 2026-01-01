@@ -19,14 +19,14 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 @Layout
 public final class MainLayout extends AppLayout {
 
-    MainLayout() {
+    public MainLayout() {
         setPrimarySection(Section.DRAWER);
         addToDrawer(createHeader(), new Scroller(createSideNav()));
     }
 
     private Component createHeader() {
         // TODO Replace with real application logo and name
-        var appLogo = VaadinIcon.CUBES.create();
+        var appLogo = VaadinIcon.CHECK_SQUARE.create();
         appLogo.setSize("48px");
         appLogo.setColor("green");
 

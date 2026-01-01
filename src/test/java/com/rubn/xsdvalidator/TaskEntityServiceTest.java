@@ -1,5 +1,7 @@
-package com.rubn.examplefeature;
+package com.rubn.xsdvalidator;
 
+import com.rubn.xsdvalidator.entities.TaskEntity;
+import com.rubn.xsdvalidator.service.TaskService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @Transactional
-class TaskServiceTest {
+class TaskEntityServiceTest {
 
     @Autowired
     TaskService taskService;
@@ -34,7 +36,7 @@ class TaskServiceTest {
 
     @Test
     public void tasks_are_validated_before_they_are_stored() {
-        assertThatThrownBy(() -> taskService.createTask("X".repeat(Task.DESCRIPTION_MAX_LENGTH + 1), null))
+        assertThatThrownBy(() -> taskService.createTask("X".repeat(TaskEntity.DESCRIPTION_MAX_LENGTH + 1), null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

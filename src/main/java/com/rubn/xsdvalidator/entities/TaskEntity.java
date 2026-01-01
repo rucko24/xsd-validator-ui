@@ -1,4 +1,4 @@
-package com.rubn.examplefeature;
+package com.rubn.xsdvalidator.entities;
 
 import jakarta.persistence.*;
 import org.jspecify.annotations.Nullable;
@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "task")
-public class Task {
+public class TaskEntity {
 
     public static final int DESCRIPTION_MAX_LENGTH = 300;
 
@@ -27,10 +27,10 @@ public class Task {
     @Nullable
     private LocalDate dueDate;
 
-    protected Task() { // To keep Hibernate happy
+    protected TaskEntity() { // To keep Hibernate happy
     }
 
-    public Task(String description, Instant creationDate) {
+    public TaskEntity(String description, Instant creationDate) {
         setDescription(description);
         this.creationDate = creationDate;
     }
@@ -71,7 +71,7 @@ public class Task {
             return true;
         }
 
-        Task other = (Task) obj;
+        TaskEntity other = (TaskEntity) obj;
         return getId() != null && getId().equals(other.getId());
     }
 

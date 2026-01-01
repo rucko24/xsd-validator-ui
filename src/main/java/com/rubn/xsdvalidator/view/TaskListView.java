@@ -1,8 +1,8 @@
-package com.rubn.examplefeature.ui;
+package com.rubn.xsdvalidator.view;
 
 import com.rubn.base.ui.ViewToolbar;
-import com.rubn.examplefeature.Task;
-import com.rubn.examplefeature.TaskService;
+import com.rubn.xsdvalidator.entities.TaskEntity;
+import com.rubn.xsdvalidator.service.TaskService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -34,7 +34,7 @@ class TaskListView extends VerticalLayout {
     final TextField description;
     final DatePicker dueDate;
     final Button createBtn;
-    final Grid<Task> taskGrid;
+    final Grid<TaskEntity> taskGrid;
 
     TaskListView(TaskService taskService) {
         this.taskService = taskService;
@@ -42,7 +42,7 @@ class TaskListView extends VerticalLayout {
         description = new TextField();
         description.setPlaceholder("What do you want to do?");
         description.setAriaLabel("Task description");
-        description.setMaxLength(Task.DESCRIPTION_MAX_LENGTH);
+        description.setMaxLength(TaskEntity.DESCRIPTION_MAX_LENGTH);
         description.setMinWidth("20em");
 
         dueDate = new DatePicker();
@@ -58,7 +58,7 @@ class TaskListView extends VerticalLayout {
 
         taskGrid = new Grid<>();
         taskGrid.setItems(query -> taskService.list(toSpringPageRequest(query)).stream());
-        taskGrid.addColumn(Task::getDescription).setHeader("Description");
+        taskGrid.addColumn(TaskEntity::getDescription).setHeader("Description");
         taskGrid.addColumn(task -> Optional.ofNullable(task.getDueDate()).map(dateFormatter::format).orElse("Never"))
                 .setHeader("Due Date");
         taskGrid.addColumn(task -> dateTimeFormatter.format(task.getCreationDate())).setHeader("Creation Date");

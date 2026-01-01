@@ -1,17 +1,28 @@
-server.port=${PORT:8080}
-logging.level.org.atmosphere=warn
+server:
+  port: ${PORT:8080}
 
-# Launch the default browser when starting the application in development mode
-vaadin.launch-browser=true
+logging:
+  level:
+    org.atmosphere: warn
 
 # To improve the performance during development.
 # For more information https://vaadin.com/docs/latest/flow/integrations/spring/configuration#special-configuration-parameters
-vaadin.allowed-packages=com.vaadin,org.vaadin,com.flowingcode,com.rubn
-
+vaadin:
+  allowed-packages: com.vaadin,org.vaadin,com.flowingcode,com.rubn
+  # Launch the default browser when starting the application in development mode
+  launch-browser: true
+  copilot:
+    enable: false
 # Let Hibernate update the schema automatically or create it if it does not exist.
 #
 # DO NOT DO THIS IN PRODUCTION!
 #
 # Instead, use Flyway or another controlled way of managing your database schema.
 # See https://vaadin.com/docs/latest/building-apps/forms-data/add-flyway for instructions.
-spring.jpa.hibernate.ddl-auto=update
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  servlet:
+    multipart.max-file-size: 50MB
+    multipart.max-request-size: 50MB
