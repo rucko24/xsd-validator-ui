@@ -44,8 +44,7 @@ public class ValidationXsdSchemaService {
 
     private StreamSource buildStreamSource(String xmlInput) throws IOException {
         InputStream inputStream = Files.newInputStream(Path.of(JAVA_IO_USER_HOME_DIR_OS.concat(OUTPUT_DIR_UI_XSD_VALIDATOR).concat(xmlInput)));
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-        return new StreamSource(bufferedInputStream);
+        return new StreamSource(new BufferedInputStream(inputStream));
     }
 
 }

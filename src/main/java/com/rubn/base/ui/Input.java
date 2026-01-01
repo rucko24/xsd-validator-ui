@@ -95,15 +95,14 @@ public class Input extends Layout {
             try {
                 String[] nombresOrdenados = MAP_PREFIX_FILE_NAME_AND_CONTENT.keySet()
                         .stream()
-                        .sorted((a, b) -> a.endsWith(".xml") ? -1 : 1)
+                        .sorted((a, b) -> a.endsWith(".xml") ? -1 : 0)
                         .toArray(String[]::new);
-
                 String xmlFileName = nombresOrdenados[0];
                 String xsdSchemaFileName = nombresOrdenados[1];
-
                 java.util.List<String> listString = this.validationXsdSchemaService.validateXmlInputWithXsdSchema(xmlFileName, xsdSchemaFileName);
-                if (!listString.isEmpty()) {
+                if (listConstaintErrors(listString)) {
                     log.info("Errors " + listString);
+                    listString.forEach(textArea::setValue);
                 } else {
                     ConfirmDialogBuilder.showInformation("Validation successfully");
                 }
@@ -119,6 +118,10 @@ public class Input extends Layout {
         actions.setAlignItems(AlignItems.CENTER);
 
         add(list, textArea, actions);
+    }
+
+    private boolean listConstaintErrors(java.util.List<String> listString) {
+        return !listString.isEmpty();
     }
 
     private CustomFileUploadHandler buildUploadHandler() {

@@ -2,14 +2,13 @@ package com.rubn.xsdvalidator;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Comparator;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MapTest {
 
-//    @RepeatedTest(5000)
+    //    @RepeatedTest(5000)
     @Test
     void getFiles() {
         Map<String, String> map = Map.of(
@@ -19,7 +18,7 @@ public class MapTest {
 
         String[] nombresOrdenados = map.keySet()
                 .stream()
-                .sorted((a, b) -> a.endsWith(".xml") ? -1 : 1)
+                .sorted((a, b) -> a.endsWith(".xml") ? -1 : 0)
                 .toArray(String[]::new);
 
         assertThat(nombresOrdenados[0]).isEqualTo("pain.xml");
