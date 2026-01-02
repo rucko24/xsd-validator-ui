@@ -11,11 +11,14 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextAreaVariant;
 import com.vaadin.flow.internal.JacksonUtils;
 import com.vaadin.flow.server.streams.TransferContext;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vaadin.flow.theme.lumo.LumoUtility.Background;
 import com.vaadin.flow.theme.lumo.LumoUtility.Border;
 import com.vaadin.flow.theme.lumo.LumoUtility.BorderColor;
@@ -26,12 +29,12 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,9 +52,11 @@ public class Input extends Layout {
     private final List list;
     private final Uploader uploader;
     private final ValidationXsdSchemaService validationXsdSchemaService;
+    private final UI ui;
 
-    public Input(final ValidationXsdSchemaService validationXsdSchemaService, ApplicationEventPublisher applicationEventPublisher) {
+    public Input(final ValidationXsdSchemaService validationXsdSchemaService, final UI ui) {
         this.validationXsdSchemaService = validationXsdSchemaService;
+        this.ui = ui;
 
         addClassNames(Background.CONTRAST_5, Border.ALL, BorderColor.CONTRAST_5, BorderRadius.LARGE,
                 Margin.Horizontal.AUTO, Margin.Top.LARGE, MaxWidth.SCREEN_MEDIUM, Padding.SMALL);
@@ -65,6 +70,10 @@ public class Input extends Layout {
         textArea.addClassNames(Padding.NONE, Width.FULL);
         textArea.addThemeName(InputTheme.TRANSPARENT);
         textArea.addThemeVariants(TextAreaVariant.LUMO_SMALL);
+        textArea.setReadOnly(true);
+        final Scroller scrollerArea = new Scroller(textArea);
+        scrollerArea.getStyle().set("scrollbar-width", "thin");
+        scrollerArea.setScrollDirection(Scroller.ScrollDirection.VERTICAL);
 
         // Actions
         attachment = new Button(VaadinIcon.UPLOAD.create());
@@ -99,17 +108,30 @@ public class Input extends Layout {
                         .toArray(String[]::new);
                 String xmlFileName = nombresOrdenados[0];
                 String xsdSchemaFileName = nombresOrdenados[1];
-                java.util.List<String> listString = this.validationXsdSchemaService.validateXmlInputWithXsdSchema(xmlFileName, xsdSchemaFileName);
-                if (listConstaintErrors(listString)) {
-                    log.info("Errors " + listString);
-                    listString.forEach(textArea::setValue);
-                } else {
-                    ConfirmDialogBuilder.showInformation("Validation successfully");
-                }
+                this.validationXsdSchemaService.validateXmlInputWithXsdSchema(xmlFileName, xsdSchemaFileName)
+                        .doOnError(onError -> {
+                            log.error("Error validating {}", xmlFileName, onError);
+                        })
+                        .delayElements(Duration.ofMillis(700))
+                        .subscribe(listConstaintErrors -> {
+                            ui.access(() -> {
+                                if (!listConstaintErrors.isEmpty()) {
+                                    log.info("Error: " + listConstaintErrors);
+                                    final Span span = new Span(listConstaintErrors);
+                                    span.addClassNames(LumoUtility.FontSize.SMALL, TextColor.SECONDARY);
+                                    super.add(span);
+                                    super.add(new Hr());
+                                } else {
+                                    ConfirmDialogBuilder.showInformation("Validation successfully");
+                                }
+                            });
+                        });
             } catch (Exception e) {
-                log.error(e.getLocalizedMessage());
-                ConfirmDialogBuilder.showWarning("Validation error " + e.getLocalizedMessage());
-                textArea.setValue(e.getLocalizedMessage());
+                ui.access(() -> {
+                    log.error(e.getLocalizedMessage());
+                    ConfirmDialogBuilder.showWarning("Validation error " + e.getLocalizedMessage());
+                    textArea.setValue(e.getLocalizedMessage());
+                });
             }
         });
 
@@ -117,7 +139,7 @@ public class Input extends Layout {
         actions.setJustifyContent(JustifyContent.BETWEEN);
         actions.setAlignItems(AlignItems.CENTER);
 
-        add(list, textArea, actions);
+        add(list, scrollerArea, actions);
     }
 
     private boolean listConstaintErrors(java.util.List<String> listString) {
@@ -131,7 +153,7 @@ public class Input extends Layout {
                     log.info("Upload started");
                 })
                 .whenComplete((transferContext, success) -> {
-                    getElement().setPropertyJson("files", JacksonUtils.createArrayNode());
+                    this.uploader.clearFileList();
                     final UI ui = transferContext.getUI();
                     if (success) {
                         log.info("Upload completed successfully");

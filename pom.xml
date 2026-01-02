@@ -4,7 +4,7 @@
     <!-- Project from https://start.vaadin.com/1f51f6f0-718c-49b1-b504-75f5c5037e28 -->
     <groupId>com.rubn</groupId>
     <artifactId>ui-xsd-validator</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -63,6 +63,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+            <version>3.8.1</version>
         </dependency>
 
         <dependency>
