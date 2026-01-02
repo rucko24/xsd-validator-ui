@@ -3,12 +3,12 @@ package com.rubn.xsdvalidator;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class XmlValidationErrorHandler implements ErrorHandler {
 
-    private final List<String> exceptions = new ArrayList<>();
+    private final List<String> exceptions = new CopyOnWriteArrayList<>();
 
     @Override
     public void warning(SAXParseException exception) {

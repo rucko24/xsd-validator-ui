@@ -15,11 +15,10 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.rubn.base.ui.Constants.JAVA_IO_USER_HOME_DIR_OS;
 import static com.rubn.base.ui.Constants.OUTPUT_DIR_XSD_VALIDATOR_UI;
@@ -68,14 +67,12 @@ public class ValidationXsdSchemaService {
      * Desde una ruta la validacion es mejor
      *
      * @param xmlFileName
-     * @return
+     * @return StreamSource
      * @throws IOException
      */
     private StreamSource buildStreamSource(String xmlFileName) throws IOException {
-        String inputStream = Files.readAllLines(Path.of(JAVA_IO_USER_HOME_DIR_OS.concat(OUTPUT_DIR_XSD_VALIDATOR_UI).concat(xmlFileName)))
-                .stream()
-                .collect(Collectors.joining("\n"));
-        return new StreamSource(new StringReader(inputStream));
+        InputStream inputStream = Files.newInputStream(Path.of(JAVA_IO_USER_HOME_DIR_OS.concat(OUTPUT_DIR_XSD_VALIDATOR_UI).concat(xmlFileName)));
+        return new StreamSource(new BufferedInputStream(inputStream));
     }
 
 }

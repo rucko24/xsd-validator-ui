@@ -28,6 +28,7 @@ public class ListItem extends com.vaadin.flow.component.html.ListItem {
     protected Layout suffix;
 
     public ListItem() {
+        setId("list-item");
         addClassNames(AlignItems.CENTER, Background.BASE, Display.FLEX, Gap.MEDIUM, Padding.Horizontal.MEDIUM,
                 Padding.Vertical.SMALL, Position.RELATIVE);
 

@@ -1,5 +1,6 @@
 package com.rubn.xsdvalidator.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,17 +10,25 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 @ExtendWith(MockitoExtension.class)
 class ValidationXsdSchemaServiceTest {
+
+    private static final Path PAIN_MOCK_PATH = Path.of("src/main/resources/documents/.xml");
+    private static final Path XSD_MOCK_PATH = Path.of("src/main/resources/documents/schema-xml.xml");
 
     @InjectMocks
     private ValidationXsdSchemaService validationXsdSchemaService;
 
     @Test
-    void buildValidatorXmlInputWithXsdSchema() throws IOException, SAXException {
+    @DisplayName("Valida xml agains xsd schema")
+    void case1() throws IOException, SAXException {
 
-        Flux<String> listString = validationXsdSchemaService.validateXmlInputWithXsdSchema(".xml", "schema-xml.xsd")
+
+        Flux<String> listString = validationXsdSchemaService.validateXmlInputWithXsdSchema(
+                PAIN_MOCK_PATH.getFileName().toString(),
+                        XSD_MOCK_PATH.getFileName().toString())
                 .doOnNext(System.out::println);
 
         StepVerifier.create(listString)

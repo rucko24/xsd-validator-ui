@@ -14,6 +14,8 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 public class FileListItem extends ListItem {
 
     public FileListItem(String prefixFileName, String contentFileSize) {
+        setHeight("40px");
+        setId("file-list-item");
         addClassNames(Background.CONTRAST_5, BorderRadius.LARGE, Padding.Horizontal.SMALL);
         getStyle().setCursor("pointer");
         removeClassName(Padding.Horizontal.MEDIUM);

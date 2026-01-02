@@ -22,7 +22,6 @@ public class List extends com.vaadin.flow.component.html.UnorderedList implement
     public List() {
         addClassNames(ListStyleType.NONE, Margin.Vertical.NONE, Padding.Start.NONE);
         setDisplay(Layout.Display.GRID);
-        setOverflow(Layout.Overflow.HIDDEN);
     }
 
     public void add(Component... components) {
