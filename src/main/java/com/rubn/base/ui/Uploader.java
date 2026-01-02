@@ -1,6 +1,8 @@
 package com.rubn.base.ui;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +34,12 @@ public class Uploader extends Upload {
         super.setUploadButton(this.uploadComponent);
         super.setDropLabel(new Span("Drop files here (.xml, xsd)"));
         super.setDropLabelIcon(new Span());
-
+        addFileRejectedListener(event -> {
+            String errorMessage = event.getErrorMessage().concat(" only (.xml, xsd)");
+            Notification notification = Notification.show(errorMessage, 2000,
+                    Notification.Position.MIDDLE);
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+        });
     }
 
     public CustomFileUploadHandler buildUploadHandler() {
