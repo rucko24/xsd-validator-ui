@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 
 import static com.rubn.base.ui.Constants.JAVA_IO_USER_HOME_DIR_OS;
-import static com.rubn.base.ui.Constants.OUTPUT_DIR_UI_XSD_VALIDATOR;
+import static com.rubn.base.ui.Constants.OUTPUT_DIR_XSD_VALIDATOR_UI;
 
 @Slf4j
 public class Uploader extends Upload {
@@ -36,7 +36,7 @@ public class Uploader extends Upload {
     }
 
     public CustomFileUploadHandler buildUploadHandler() {
-        return new CustomFileUploadHandler(JAVA_IO_USER_HOME_DIR_OS.concat(OUTPUT_DIR_UI_XSD_VALIDATOR), this);
+        return new CustomFileUploadHandler(JAVA_IO_USER_HOME_DIR_OS.concat(OUTPUT_DIR_XSD_VALIDATOR_UI), this);
     }
 
 }

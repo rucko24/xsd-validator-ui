@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.rubn.base.ui.Constants.JAVA_IO_USER_HOME_DIR_OS;
-import static com.rubn.base.ui.Constants.OUTPUT_DIR_UI_XSD_VALIDATOR;
+import static com.rubn.base.ui.Constants.OUTPUT_DIR_XSD_VALIDATOR_UI;
 
 @Slf4j
 public class Input extends Layout {
@@ -182,7 +182,7 @@ public class Input extends Layout {
                     .addConfirmListener(confirm -> {
                         list.remove(fileListItem);
                         try {
-                            Files.deleteIfExists(Path.of(JAVA_IO_USER_HOME_DIR_OS.concat(OUTPUT_DIR_UI_XSD_VALIDATOR).concat(fileName)));
+                            Files.deleteIfExists(Path.of(JAVA_IO_USER_HOME_DIR_OS.concat(OUTPUT_DIR_XSD_VALIDATOR_UI).concat(fileName)));
                         } catch (IOException e) {
                             log.error(e.getMessage());
                             ConfirmDialogBuilder.showWarningUI("File could not be deleted " + fileName, transferContext.getUI());

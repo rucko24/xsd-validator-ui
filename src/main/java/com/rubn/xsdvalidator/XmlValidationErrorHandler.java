@@ -2,6 +2,7 @@ package com.rubn.xsdvalidator;
 
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
+
 import java.util.ArrayList;
 import java.util.List;
 

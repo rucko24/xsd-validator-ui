@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
     <!-- Project from https://start.vaadin.com/1f51f6f0-718c-49b1-b504-75f5c5037e28 -->
     <groupId>com.rubn</groupId>
-    <artifactId>ui-xsd-validator</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <artifactId>xsd-validator-ui</artifactId>
+    <version>1.0.5-SNAPSHOT</version>
     <packaging>jar</packaging>
     
     <properties>

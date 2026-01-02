@@ -17,11 +17,11 @@ class ValidationXsdSchemaServiceTest {
     private ValidationXsdSchemaService validationXsdSchemaService;
 
     @Test
-    void validateXmlInputWithXsdSchema() throws IOException, SAXException {
+    void buildValidatorXmlInputWithXsdSchema() throws IOException, SAXException {
 
-        Flux<String> listString = validationXsdSchemaService.validateXmlInputWithXsdSchema(".xml", "schema-xml.xsd");
-//                .doOnNext(System.out::println);
-//
+        Flux<String> listString = validationXsdSchemaService.validateXmlInputWithXsdSchema(".xml", "schema-xml.xsd")
+                .doOnNext(System.out::println);
+
         StepVerifier.create(listString)
                 .expectNext("ERROR: Línea 45, Columna 63: cvc-pattern-valid: El valor 'ES79 2100 0000 0000 0000 0000' no es de faceta válida con respecto al patrón '[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}' para el tipo 'IBAN2007Identifier'.")
                 .expectNext("ERROR: Línea 45, Columna 63: cvc-type.3.1.3: El valor 'ES79 2100 0000 0000 0000 0000' del elemento 'IBAN' no es válido.")

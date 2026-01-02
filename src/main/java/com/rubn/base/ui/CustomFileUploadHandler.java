@@ -1,6 +1,5 @@
 package com.rubn.base.ui;
 
-import com.rubn.base.ui.utility.ConfirmDialogBuilder;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.server.communication.TransferUtil;
 import com.vaadin.flow.server.streams.TransferContext;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Consumer;
 
 /**
  * @author rubn
