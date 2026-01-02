@@ -5,30 +5,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.xml.sax.SAXException;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 @ExtendWith(MockitoExtension.class)
 class ValidationXsdSchemaServiceTest {
 
     private static final Path PAIN_MOCK_PATH = Path.of("src/main/resources/documents/.xml");
-    private static final Path XSD_MOCK_PATH = Path.of("src/main/resources/documents/schema-xml.xml");
+    private static final Path XSD_MOCK_PATH = Path.of("src/main/resources/documents/schema-xml.xsd");
 
     @InjectMocks
     private ValidationXsdSchemaService validationXsdSchemaService;
 
     @Test
     @DisplayName("Valida xml agains xsd schema")
-    void case1() throws IOException, SAXException {
+    void case1() throws IOException {
 
+        InputStream inputStream1 = new BufferedInputStream(Files.newInputStream(PAIN_MOCK_PATH));
+        InputStream inputStream2 = new BufferedInputStream(Files.newInputStream(XSD_MOCK_PATH));
 
-        Flux<String> listString = validationXsdSchemaService.validateXmlInputWithXsdSchema(
-                PAIN_MOCK_PATH.getFileName().toString(),
-                        XSD_MOCK_PATH.getFileName().toString())
+        Flux<String> listString = validationXsdSchemaService.validateXmlInputWithXsdSchema(inputStream1, inputStream2)
                 .doOnNext(System.out::println);
 
         StepVerifier.create(listString)

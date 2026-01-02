@@ -5,8 +5,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Constants {
 
-    public static final String JAVA_IO_USER_HOME_DIR_OS = System.getProperty("user.home");
-    public static final String OUTPUT_DIR_XSD_VALIDATOR_UI = "/xsd-validator-ui/";
     public static final String OK = "OK";
     public static final String INFORMATION = "Information";
     public static final String WARNING = "Warning";
@@ -30,6 +28,5 @@ public class Constants {
                 this.appendChild(style);
             """;
     public static final String WINDOW_COPY_TO_CLIPBOARD = "window.copyToClipboard($0)";
-    public static final String BOX_SHADOW_PROPERTY = "box-shadow";
-    public static final String BOX_SHADOW_VALUE = "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)";
+
 }

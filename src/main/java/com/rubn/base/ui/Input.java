@@ -1,9 +1,9 @@
 package com.rubn.base.ui;
 
+import com.infraleap.animatecss.Animated;
 import com.rubn.base.ui.list.FileListItem;
 import com.rubn.base.ui.list.List;
 import com.rubn.base.ui.utility.ConfirmDialogBuilder;
-import com.rubn.base.ui.utility.InputTheme;
 import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -18,7 +18,9 @@ import com.vaadin.flow.internal.JacksonUtils;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.server.Command;
-import com.vaadin.flow.server.streams.TransferContext;
+import com.vaadin.flow.server.streams.InMemoryUploadHandler;
+import com.vaadin.flow.server.streams.UploadHandler;
+import com.vaadin.flow.server.streams.UploadMetadata;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vaadin.flow.theme.lumo.LumoUtility.Background;
 import com.vaadin.flow.theme.lumo.LumoUtility.Border;
@@ -31,23 +33,21 @@ import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.rubn.base.ui.Constants.BORDER_BOTTOM_COLOR;
-import static com.rubn.base.ui.Constants.JAVA_IO_USER_HOME_DIR_OS;
-import static com.rubn.base.ui.Constants.OUTPUT_DIR_XSD_VALIDATOR_UI;
 import static com.rubn.base.ui.Constants.SCROLLBAR_CUSTOM_STYLE;
 import static com.rubn.base.ui.Constants.WINDOW_COPY_TO_CLIPBOARD;
 
 @Slf4j
 public class Input extends Layout implements BeforeEnterObserver {
 
-    private static final Map<String, String> MAP_PREFIX_FILE_NAME_AND_CONTENT = new HashMap<>();
+    private static final Map<String, InputStream> MAP_PREFIX_FILE_NAME_AND_CONTENT = new ConcurrentHashMap<>();
 
     private final VerticalLayout verticalLayoutArea;
     private final Button attachment;
@@ -62,8 +62,8 @@ public class Input extends Layout implements BeforeEnterObserver {
 
         addClassNames(Background.CONTRAST_5, Border.ALL, BorderColor.CONTRAST_5, BorderRadius.LARGE,
                 Margin.Horizontal.AUTO, Margin.Top.LARGE, MaxWidth.SCREEN_MEDIUM, Padding.SMALL);
-        setBoxSizing(Layout.BoxSizing.BORDER);
-        setFlexDirection(Layout.FlexDirection.COLUMN);
+        setBoxSizing(BoxSizing.BORDER);
+        setFlexDirection(FlexDirection.COLUMN);
         setGap(Gap.SMALL);
         setMaxHeight("400px");
 
@@ -71,7 +71,6 @@ public class Input extends Layout implements BeforeEnterObserver {
         verticalLayoutArea = new VerticalLayout();
         verticalLayoutArea.setHeight("350px");
         verticalLayoutArea.addClassNames(Padding.NONE, Width.FULL);
-        verticalLayoutArea.addThemeName(InputTheme.TRANSPARENT);
         verticalLayoutArea.getStyle().setOverflow(Style.Overflow.AUTO);
         verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
 
@@ -106,45 +105,45 @@ public class Input extends Layout implements BeforeEnterObserver {
         validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         validateButton.setAriaLabel("Validate");
         validateButton.setTooltipText("validate");
-        validateButton.addClickListener(event -> {
-            try {
-                String[] nombresOrdenados = MAP_PREFIX_FILE_NAME_AND_CONTENT.keySet()
-                        .stream()
-                        .sorted((a, b) -> a.endsWith(".xml") ? -1 : 0)
-                        .toArray(String[]::new);
-                String xmlFileName = nombresOrdenados[0];
-                String xsdSchemaFileName = nombresOrdenados[1];
-                this.validationXsdSchemaService.validateXmlInputWithXsdSchema(xmlFileName, xsdSchemaFileName)
-                        .doOnError(onError -> {
-                            this.executeUI(() -> {
-                                log.error("Error validating: {}", xmlFileName, onError);
-                            });
-                        })
-                        .delayElements(Duration.ofMillis(700))
-                        .subscribe(listConstaintErrors -> {
-                            this.executeUI(() -> {
-                                if (!listConstaintErrors.isEmpty()) {
-                                    log.info("Error: " + listConstaintErrors);
-                                    this.buildCustomSpan(listConstaintErrors);
-                                } else {
-                                    ConfirmDialogBuilder.showInformation("Validation successfully");
-                                }
-                            });
-                        });
-            } catch (Exception e) {
-                this.executeUI(() -> {
-                    log.error(e.getLocalizedMessage());
-                    ConfirmDialogBuilder.showWarning("Validation error " + e.getLocalizedMessage());
-                    this.buildCustomSpan(e.getLocalizedMessage());
-                });
-            }
-        });
+        validateButton.addClickListener(event -> validate());
 
         Layout actions = new Layout(this.uploader, validateButton);
         actions.setJustifyContent(JustifyContent.BETWEEN);
         actions.setAlignItems(AlignItems.CENTER);
 
         add(list, verticalLayoutArea, actions);
+    }
+
+    private void validate() {
+        String[] sortedNamesByExtension = MAP_PREFIX_FILE_NAME_AND_CONTENT.keySet()
+                .stream()
+                .sorted((a, b) -> a.endsWith(".xml") ? -1 : 0)
+                .toArray(String[]::new);
+        String xmlFileName = sortedNamesByExtension[0];
+        String xsdSchemaFileName = sortedNamesByExtension[1];
+
+        InputStream inputXml = MAP_PREFIX_FILE_NAME_AND_CONTENT.get(xmlFileName);
+        InputStream inputXsdSchema = MAP_PREFIX_FILE_NAME_AND_CONTENT.get(xsdSchemaFileName);
+
+        this.validationXsdSchemaService.validateXmlInputWithXsdSchema(inputXml, inputXsdSchema)
+                .doOnError(onError -> {
+                    this.executeUI(() -> {
+                        log.error("Error validating: {}", xmlFileName, onError);
+                        ConfirmDialogBuilder.showWarning("Validation error " + onError.getLocalizedMessage());
+                        this.buildCustomSpan(onError.getLocalizedMessage());
+                    });
+                })
+                .delayElements(Duration.ofMillis(700))
+                .subscribe(listConstaintErrors -> {
+                    this.executeUI(() -> {
+                        if (!listConstaintErrors.isEmpty()) {
+                            log.info("Error: " + listConstaintErrors);
+                            this.buildCustomSpan(listConstaintErrors);
+                        } else {
+                            ConfirmDialogBuilder.showInformation("Validation successfully");
+                        }
+                    });
+                });
     }
 
     private void buildCustomSpan(String listConstaintErrors) {
@@ -161,6 +160,7 @@ public class Input extends Layout implements BeforeEnterObserver {
             Notification.show("Error copied!", 2000, Notification.Position.BOTTOM_CENTER);
         });
         verticalLayoutArea.add(span);
+        Animated.animate(span, Animated.Animation.FADE_IN);
     }
 
     private void executeUI(Command command) {
@@ -169,34 +169,34 @@ public class Input extends Layout implements BeforeEnterObserver {
         });
     }
 
-    private boolean listConstaintErrors(java.util.List<String> listString) {
-        return !listString.isEmpty();
-    }
-
-    private CustomFileUploadHandler buildUploadHandler() {
-        return this.uploader.buildUploadHandler()
-                .whenStart(() -> {
-                    getElement().setPropertyJson("files", JacksonUtils.createArrayNode());
-                    log.info("Upload started");
-                })
-                .whenComplete((transferContext, success) -> {
-                    this.uploader.clearFileList();
-                    final UI ui = transferContext.getUI();
-                    if (success) {
-                        log.info("Upload completed successfully");
-                        this.processFile(transferContext);
-                    } else {
-                        log.info("Upload failed");
-                        ConfirmDialogBuilder.showWarningUI(transferContext.exception().getMessage(), ui);
+    private InMemoryUploadHandler buildUploadHandler() {
+        return UploadHandler.inMemory((metadata, data) -> {
+                    try (final InputStream inputStream = new ByteArrayInputStream(data)) {
+                        this.processFile(metadata, inputStream);
+                    } catch (IOException error) {
+                        log.error(error.getMessage());
+                        ConfirmDialogBuilder.showWarning("File transfer failed: " + error.getMessage());
                     }
+                })
+                .whenStart(() -> log.info("Upload started"))
+                .whenComplete((transferContext, aBoolean) -> {
+                    this.uploader.clearFileList();
+                    log.info("Upload complete");
                 });
     }
 
-    private void processFile(final TransferContext transferContext) {
-        final String fileName = transferContext.fileName();
-        long contentLength = transferContext.contentLength();
-        String content = "Code ⋅ " + contentLength + "KB";
-        MAP_PREFIX_FILE_NAME_AND_CONTENT.put(fileName, content);
+    private void processFile(final UploadMetadata uploadMetadata, InputStream inputStream) {
+        final String fileName = uploadMetadata.fileName();
+        long contentLength = uploadMetadata.contentLength();
+        String content = "Size ⋅ " + contentLength + "KB";
+        try {
+            MAP_PREFIX_FILE_NAME_AND_CONTENT.put(fileName, inputStream);
+        } catch (Exception ex) {
+            log.error("Error al obtener inputstreams desde el vaadinRequest {}", ex.getMessage());
+            ConfirmDialogBuilder.showWarning("Validation error " + ex.getMessage());
+            return;
+        }
+
         final FileListItem fileListItem = new FileListItem(fileName, content);
         list.add(fileListItem);
 
@@ -205,16 +205,12 @@ public class Input extends Layout implements BeforeEnterObserver {
         final ContextMenu contextMenu = new ContextMenu();
         contextMenu.setTarget(fileListItem);
         contextMenu.addItem("Delete", event -> {
-            ConfirmDialogBuilder.showConfirmInformation("Do you want to delete: " + fileName, transferContext.getUI())
-                    .addConfirmListener(confirm -> {
-                        list.remove(fileListItem);
-                        try {
-                            Files.deleteIfExists(Path.of(JAVA_IO_USER_HOME_DIR_OS.concat(OUTPUT_DIR_XSD_VALIDATOR_UI).concat(fileName)));
-                        } catch (IOException e) {
-                            log.error(e.getMessage());
-                            ConfirmDialogBuilder.showWarningUI("File could not be deleted " + fileName, transferContext.getUI());
-                        }
-                    });
+            event.getSource().getUI().ifPresent(ui -> {
+                ConfirmDialogBuilder.showConfirmInformation("Do you want to delete: " + fileName, ui)
+                        .addConfirmListener(confirm -> {
+                            list.remove(fileListItem);
+                        });
+            });
         });
 
     }

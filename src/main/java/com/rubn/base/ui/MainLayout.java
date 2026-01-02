@@ -1,16 +1,17 @@
 package com.rubn.base.ui;
 
+import com.rubn.xsdvalidator.records.AppVersionRecord;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
-import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
@@ -19,21 +20,27 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 @Layout
 public final class MainLayout extends AppLayout {
 
-    public MainLayout() {
+    private final AppVersionRecord appVersionRecord;
+
+    public MainLayout(AppVersionRecord appVersionRecord) {
+        this.appVersionRecord = appVersionRecord;
         setPrimarySection(Section.DRAWER);
         addToDrawer(createHeader(), new Scroller(createSideNav()));
     }
 
     private Component createHeader() {
-        // TODO Replace with real application logo and name
-        var appLogo = VaadinIcon.CHECK_SQUARE.create();
-        appLogo.setSize("48px");
-        appLogo.setColor("green");
+        final Image logo = new Image("logo.png", "logo");
+        Tooltip.forComponent(logo).setText("https://github.com/rucko24/xsd-validator-ui");
+        logo.getStyle().setCursor("pointer");
+        logo.setWidth("50%");
+        logo.addClickListener(e -> {
+            getUI().ifPresent(ui -> ui.getPage().open("https://github.com/rucko24/xsd-validator-ui"));
+        });
 
-        var appName = new Span("My Application");
-        appName.getStyle().setFontWeight(Style.FontWeight.BOLD);
+        final Span spanName = new Span(appVersionRecord.version());
+        spanName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.XXSMALL, LumoUtility.TextColor.SECONDARY);
 
-        var header = new VerticalLayout(appLogo, appName);
+        var header = new VerticalLayout(logo, spanName);
         header.setAlignItems(FlexComponent.Alignment.CENTER);
         return header;
     }

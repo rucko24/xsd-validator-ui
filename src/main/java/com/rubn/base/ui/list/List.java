@@ -36,15 +36,6 @@ public class List extends com.vaadin.flow.component.html.UnorderedList implement
     }
 
     /**
-     * Sets the background color.
-     */
-    public void setBackground(Color.Background background) {
-        removeBackgroundColor();
-        addClassNames(background.getClassName());
-        this.background = background;
-    }
-
-    /**
      * Removes the background color.
      */
     public void removeBackgroundColor() {

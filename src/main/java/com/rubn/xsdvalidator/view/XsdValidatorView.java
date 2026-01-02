@@ -8,12 +8,14 @@ import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
 @UIScope
 @SpringComponent
-@Route("xsd-validator")
+@Route("")
+@RouteAlias("xsd-validator")
 @PageTitle("xsd-validator")
 @Menu(order = 1, icon = "vaadin:clipboard-check", title = "XSD Validator")
 class XsdValidatorView extends Main {

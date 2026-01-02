@@ -8,9 +8,6 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 
-import static com.rubn.base.ui.Constants.JAVA_IO_USER_HOME_DIR_OS;
-import static com.rubn.base.ui.Constants.OUTPUT_DIR_XSD_VALIDATOR_UI;
-
 @Slf4j
 public class Uploader extends Upload {
 
@@ -26,24 +23,20 @@ public class Uploader extends Upload {
      */
     private void uploadInitialConfig() {
         super.setDropAllowed(true);
-        super.setMaxFiles(1);
+        super.setMaxFiles(2);
         super.setWidthFull();
         super.addClassNames(LumoUtility.Padding.XSMALL, LumoUtility.Margin.Right.MEDIUM, LumoUtility.Margin.Left.NONE);
 
         super.setAcceptedFileTypes(MediaType.APPLICATION_XML_VALUE, ".xml", ".xsd");
         super.setUploadButton(this.uploadComponent);
-        super.setDropLabel(new Span("Drop files here (.xml|.xsd)"));
+        super.setDropLabel(new Span("Drop files here xml and xsd"));
         super.setDropLabelIcon(new Span());
-        addFileRejectedListener(event -> {
-            String errorMessage = "Incorrect file type, only (.xml|.xsd)";
+        super.addFileRejectedListener(event -> {
+            String errorMessage = "Incorrect file type, only xml and xsd";
             Notification notification = Notification.show(errorMessage, 2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         });
-    }
-
-    public CustomFileUploadHandler buildUploadHandler() {
-        return new CustomFileUploadHandler(JAVA_IO_USER_HOME_DIR_OS.concat(OUTPUT_DIR_XSD_VALIDATOR_UI), this);
     }
 
 }

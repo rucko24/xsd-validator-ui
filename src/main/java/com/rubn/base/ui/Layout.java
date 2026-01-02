@@ -1,18 +1,11 @@
 package com.rubn.base.ui;
 
-import com.rubn.base.ui.utility.Breakpoint;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
-import java.util.HashMap;
-
 public class Layout extends Div {
 
-    private final HashMap<Breakpoint, Display> responsiveDisplay;
-    private final HashMap<Breakpoint, FlexDirection> responsiveFlexDirection;
-    private final HashMap<Breakpoint, GridColumns> responsiveColumns;
-    private final HashMap<Component, ColumnSpan> columnSpans;
     private AlignItems alignItems;
     private AlignSelf alignSelf;
     private BoxSizing boxSizing;
@@ -32,10 +25,6 @@ public class Layout extends Div {
 
         setDisplay(Display.FLEX);
 
-        this.responsiveDisplay = new HashMap<>();
-        this.responsiveFlexDirection = new HashMap<>();
-        this.responsiveColumns = new HashMap<>();
-        this.columnSpans = new HashMap<>();
     }
 
     public void setAlignItems(AlignItems alignItems) {
@@ -151,17 +140,6 @@ public class Layout extends Div {
         }
         addClassNames(gridColumns.getClassName());
         this.gridColumns = gridColumns;
-    }
-
-    /**
-     * Sets the number of grid columns for a given breakpoint.
-     */
-    public void setColumns(Breakpoint breakpoint, GridColumns gridColumns) {
-        if (this.responsiveColumns.get(breakpoint) != null) {
-            removeClassName(breakpoint.getPrefix() + ":" + this.responsiveColumns.get(breakpoint).getClassName());
-        }
-        addClassNames(breakpoint.getPrefix() + ":" + gridColumns.getClassName());
-        this.responsiveColumns.put(breakpoint, gridColumns);
     }
 
     /**
