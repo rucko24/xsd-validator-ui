@@ -32,10 +32,10 @@ public class Uploader extends Upload {
 
         super.setAcceptedFileTypes(MediaType.APPLICATION_XML_VALUE, ".xml", ".xsd");
         super.setUploadButton(this.uploadComponent);
-        super.setDropLabel(new Span("Drop files here (.xml, xsd)"));
+        super.setDropLabel(new Span("Drop files here (.xml|.xsd)"));
         super.setDropLabelIcon(new Span());
         addFileRejectedListener(event -> {
-            String errorMessage = event.getErrorMessage().concat(" only (.xml, xsd)");
+            String errorMessage = "Incorrect file type, only (.xml|.xsd)";
             Notification notification = Notification.show(errorMessage, 2000,
                     Notification.Position.MIDDLE);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
