@@ -1,4 +1,4 @@
-package com.rubn.base.ui;
+package com.rubn.xsdvalidator.util;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Div;

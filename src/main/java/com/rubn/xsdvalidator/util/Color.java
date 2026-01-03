@@ -1,4 +1,4 @@
-package com.rubn.base.ui.utility;
+package com.rubn.xsdvalidator.util;
 
 import com.vaadin.flow.theme.lumo.LumoUtility;
 

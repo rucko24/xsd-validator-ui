@@ -1,10 +1,11 @@
-package com.rubn.base.ui;
+package com.rubn.xsdvalidator.view;
 
-import com.infraleap.animatecss.Animated;
-import com.rubn.base.ui.list.FileListItem;
-import com.rubn.base.ui.list.ListCustom;
-import com.rubn.base.ui.utility.ConfirmDialogBuilder;
 import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
+import com.rubn.xsdvalidator.util.ConfirmDialogBuilder;
+import com.rubn.xsdvalidator.util.Layout;
+import com.rubn.xsdvalidator.util.XsdValidatorConstants;
+import com.rubn.xsdvalidator.view.list.FileListItem;
+import com.rubn.xsdvalidator.view.list.ListCustom;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ScrollIntoViewOption;
 import com.vaadin.flow.component.UI;
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -37,6 +39,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.ByteArrayInputStream;
@@ -46,11 +49,11 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.rubn.base.ui.Constants.BORDER_BOTTOM_COLOR;
-import static com.rubn.base.ui.Constants.CONTEXT_MENU_ITEM_NO_CHECKMARK;
-import static com.rubn.base.ui.Constants.SCROLLBAR_CUSTOM_STYLE;
-import static com.rubn.base.ui.Constants.VAR_CUSTOM_BOX_SHADOW;
-import static com.rubn.base.ui.Constants.WINDOW_COPY_TO_CLIPBOARD;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.BORDER_BOTTOM_COLOR;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CONTEXT_MENU_ITEM_NO_CHECKMARK;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.SCROLLBAR_CUSTOM_STYLE;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.VAR_CUSTOM_BOX_SHADOW;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.WINDOW_COPY_TO_CLIPBOARD;
 
 @Slf4j
 public class Input extends Layout implements BeforeEnterObserver {
@@ -70,7 +73,7 @@ public class Input extends Layout implements BeforeEnterObserver {
     /**
      * Mutable fields
      */
-    private Span span;
+    private Span errorSpan;
 
     public Input(final ValidationXsdSchemaService validationXsdSchemaService) {
         this.validationXsdSchemaService = validationXsdSchemaService;
@@ -85,7 +88,7 @@ public class Input extends Layout implements BeforeEnterObserver {
 
         // Text area
         verticalLayoutArea = new VerticalLayout();
-        verticalLayoutArea.getStyle().setCursor("pointer");
+        verticalLayoutArea.getStyle().setCursor(XsdValidatorConstants.CURSOS_POINTER);
         verticalLayoutArea.setHeight("350px");
         verticalLayoutArea.addClassNames(Padding.NONE, Width.FULL);
         verticalLayoutArea.getStyle().setOverflow(Style.Overflow.AUTO);
@@ -96,8 +99,18 @@ public class Input extends Layout implements BeforeEnterObserver {
             verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
         }).addClassName(CONTEXT_MENU_ITEM_NO_CHECKMARK);
 
+//        final SvgIcon iconCopyAll = SvgFactory.createCopyButtonFromSvg();
+//        iconCopyAll.setSize("30px");
+//        iconCopyAll.getStyle().setCursor(XsdValidatorConstants.CURSOS_POINTER);
+//        iconCopyAll.addClassNames(Margin.Left.AUTO, "icon-hover-effect");
+//        iconCopyAll.addClickListener(event -> {
+//            UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, errorSpan.getText());
+//            Notification.show("Error copied!", 2000, Notification.Position.MIDDLE)
+//                    .addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+//        });
+
         //Build error span
-        this.span = this.buildErrorSpan();
+        this.errorSpan = this.buildErrorSpan();
 
         // Actions
         attachment = new Button(VaadinIcon.UPLOAD.create());
@@ -112,13 +125,14 @@ public class Input extends Layout implements BeforeEnterObserver {
         list.setDisplay(Display.FLEX);
         list.setGap(Gap.SMALL);
         list.removeBackgroundColor();
-        final Button buttonClearAll = new  Button(new Icon("lumo","cross"));
+
+        final Button buttonClearAll = new Button(new Icon("lumo", "cross"));
         buttonClearAll.setTooltipText("Clear files!");
-        buttonClearAll.getStyle().setCursor("pointer");
+        buttonClearAll.getStyle().setCursor(XsdValidatorConstants.CURSOS_POINTER);
         buttonClearAll.addClassNames(Margin.Left.AUTO, "close-button-hover");
         buttonClearAll.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE);
         buttonClearAll.addClickListener(event -> {
-           list.removeAll();
+            list.removeAll();
             mapPrefixFileNameAndContent.clear();
             list.add(buttonClearAll);
         });
@@ -139,9 +153,11 @@ public class Input extends Layout implements BeforeEnterObserver {
         validateButton.setAriaLabel("Validate");
         validateButton.setTooltipText("validate");
         validateButton.addClickListener(event -> {
-            if (this.tenemosLaParejaCompleta()) {
-                validate();
+            if (!this.checkUploadedFiles()) {
+                ConfirmDialogBuilder.showWarning("No se ah podido iniciar la validacion, revisa los ficheros subidos");
+                return;
             }
+            this.validateXmlInputWithXsdSchema();
         });
 
         Layout actions = new Layout(this.uploader, validateButton);
@@ -151,20 +167,26 @@ public class Input extends Layout implements BeforeEnterObserver {
         add(list, verticalLayoutArea, actions);
     }
 
-    private Span buildErrorSpan() {
-        final Span span = new Span();
-        span.getStyle().setCursor("pointer");
-        Tooltip.forComponent(span).setText("Copy text");
-        span.addClassNames(LumoUtility.FontSize.SMALL, TextColor.SECONDARY);
-        span.getStyle().setBorderBottom(BORDER_BOTTOM_COLOR);
-        span.addClickListener(event -> {
-            UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, span.getText());
-            Notification.show("Error copied!", 2000, Notification.Position.BOTTOM_CENTER);
-        });
-        return span;
+    private InMemoryUploadHandler buildUploadHandler() {
+        return UploadHandler.inMemory((metadata, data) -> {
+                    //without buffered, prevent a SAXException
+                    try (final InputStream inputStream = new ByteArrayInputStream(data)) {
+
+                        this.processFile(metadata, inputStream);
+
+                    } catch (IOException error) {
+                        log.error(error.getMessage());
+                        ConfirmDialogBuilder.showWarning("File transfer failed: " + error.getMessage());
+                    }
+                })
+                .whenStart(() -> {
+                    log.info("Upload started");
+                    this.uploader.clearFileList();
+                })
+                .whenComplete((transferContext, aBoolean) -> log.info("Upload complete"));
     }
 
-    private void validate() {
+    private void validateXmlInputWithXsdSchema() {
         String[] sortedNamesByExtension = mapPrefixFileNameAndContent.keySet()
                 .stream()
                 .sorted((a, b) -> a.endsWith(".xml") ? -1 : 0)
@@ -185,11 +207,11 @@ public class Input extends Layout implements BeforeEnterObserver {
                     });
                 })
                 .delayElements(Duration.ofMillis(50), Schedulers.boundedElastic())
-                .subscribe(listConstaintErrors -> {
+                .subscribe(word -> {
                     this.executeUI(() -> {
-                        if (!listConstaintErrors.isEmpty()) {
-                            log.info(listConstaintErrors);
-                            this.buildCustomSpan(listConstaintErrors);
+                        if (!word.isEmpty()) {
+                            log.info(word);
+                            this.buildCustomSpan(word);
                             this.resetInputStream();
                         } else {
                             ConfirmDialogBuilder.showInformation("Validation successfully");
@@ -197,6 +219,31 @@ public class Input extends Layout implements BeforeEnterObserver {
                         }
                     });
                 });
+    }
+
+    private void buildCustomSpan(String word) {
+        //Obliga a crear otro span mas abajo en el VerticalLayout
+        if (word.equals("ERROR:") || word.equals("WARNING:") || word.equals("FATAL:")) {
+            this.errorSpan = this.buildErrorSpan();
+        }
+        String jsCommand = "this.insertAdjacentHTML('beforeend', '<span class=\"error-word\">' + $0 + '</span> ')";
+        this.errorSpan.getElement().executeJs(jsCommand, errorSpan.getText().concat(word).concat(StringUtils.SPACE));
+    }
+
+    private Span buildErrorSpan() {
+        final Span span = new Span();
+        span.getStyle().setCursor(XsdValidatorConstants.CURSOS_POINTER);
+        Tooltip.forComponent(span).setText("Copy text");
+        span.addClassNames(LumoUtility.FontSize.SMALL, TextColor.SECONDARY);
+        span.getStyle().setBorderBottom(BORDER_BOTTOM_COLOR);
+        span.addClickListener(event -> {
+            UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, span.getText());
+            Notification.show("Error copied!", 2000, Notification.Position.MIDDLE)
+                    .addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+        });
+        verticalLayoutArea.add(span);
+        verticalLayoutArea.scrollIntoView(ScrollIntoViewOption.Behavior.SMOOTH);
+        return span;
     }
 
     /**
@@ -207,54 +254,9 @@ public class Input extends Layout implements BeforeEnterObserver {
             try {
                 v.reset();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                log.error("resetInputStream {}", e.getMessage());
             }
         });
-    }
-
-    private void buildCustomSpan(String listConstaintErrors) {
-        if(listConstaintErrors.equals("ERROR:")
-                ||  listConstaintErrors.equals("WARNING:") || listConstaintErrors.equals("FATAL:")) {
-            span = this.buildErrorSpan();
-        }
-        span.setText(span.getText().concat(listConstaintErrors).concat(" "));
-        Animated.animate(span, Animated.Animation.FADE_IN);
-//        final SvgIcon icon = new SvgIcon(DownloadHandler.forClassResource(getClass(),
-//                "/META-INF/resources/svg-images/copy-alt.svg" + "copy-alt.svg"));
-//        icon.setSize("25px");
-        verticalLayoutArea.add(span);
-        verticalLayoutArea.scrollIntoView(ScrollIntoViewOption.Behavior.SMOOTH);
-    }
-
-    private void executeUI(Command command) {
-        super.getUI().ifPresent(ui -> {
-            try {
-                ui.access(command);
-            } catch (UIDetachedException ex) {}
-        });
-    }
-
-    private InMemoryUploadHandler buildUploadHandler() {
-        return UploadHandler.inMemory((metadata, data) -> {
-                    //without buffered, prevent a SAXException
-                    try {
-                        String incomingFileName = metadata.fileName();
-                        this.validateToAggregate(incomingFileName);
-                        try (final InputStream inputStream = new ByteArrayInputStream(data)) {
-                            this.processFile(metadata, inputStream);
-                        } catch (IOException error) {
-                            log.error(error.getMessage());
-                            ConfirmDialogBuilder.showWarning("File transfer failed: " + error.getMessage());
-                        }
-                    } catch (IllegalArgumentException e) {
-                        ConfirmDialogBuilder.showWarning(e.getMessage());
-                    }
-                })
-                .whenStart(() -> {
-                    log.info("Upload started");
-                    this.uploader.clearFileList();
-                })
-                .whenComplete((transferContext, aBoolean) -> log.info("Upload complete"));
     }
 
     private void processFile(final UploadMetadata uploadMetadata, InputStream inputStream) {
@@ -292,38 +294,39 @@ public class Input extends Layout implements BeforeEnterObserver {
 
     private HorizontalLayout createRowItemWithVaadinIcon(final String titleForSpan, VaadinIcon icon) {
         final HorizontalLayout row = new HorizontalLayout();
+        row.setSpacing(false);
+        row.addClassNames(LumoUtility.Gap.SMALL);
         final com.vaadin.flow.component.html.Span span = new com.vaadin.flow.component.html.Span(titleForSpan);
         var iconCustomSize = icon.create();
         iconCustomSize.setSize("20px");
         row.add(iconCustomSize, span);
-        row.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        row.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.START);
         return row;
     }
 
-    private void validateToAggregate(String incomingName) {
-        boolean isXml = incomingName.toLowerCase().endsWith(".xml");
-        boolean isXsd = incomingName.toLowerCase().endsWith(".xsd");
-        // Revisamos el mapa actual
-        long xmlCount = mapPrefixFileNameAndContent.keySet()
-                .stream()
-                .filter(k -> k.toLowerCase().endsWith(".xml")).count();
-        long xsdCount = mapPrefixFileNameAndContent.keySet()
-                .stream()
-                .filter(k -> k.toLowerCase().endsWith(".xsd")).count();
-        if (isXml && xmlCount >= 1) {
-            throw new IllegalArgumentException("An XML file already exists.");
-        }
-        if (isXsd && xsdCount >= 1) {
-            throw new IllegalArgumentException("An XSD file already exists.");
-        }
-    }
-
-    private boolean tenemosLaParejaCompleta() {
+    /**
+     * Para dos ficheros, xsd o xml bien, pero para varias "xsd" no
+     * <p>
+     * A veces una xsd puede importar otras más
+     *
+     * @return boolean
+     *
+     */
+    private boolean checkUploadedFiles() {
         long xmlCount = mapPrefixFileNameAndContent.keySet().stream()
                 .filter(k -> k.toLowerCase().endsWith(".xml")).count();
         long xsdCount = mapPrefixFileNameAndContent.keySet().stream()
                 .filter(k -> k.toLowerCase().endsWith(".xsd")).count();
-        return xmlCount == 1 && xsdCount == 1;
+        return xmlCount >= 1 && xsdCount >= 1;
+    }
+
+    private void executeUI(Command command) {
+        super.getUI().ifPresent(ui -> {
+            try {
+                ui.access(command);
+            } catch (UIDetachedException ex) {
+            }
+        });
     }
 
     @Override

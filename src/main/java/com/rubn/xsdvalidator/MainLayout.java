@@ -1,6 +1,7 @@
-package com.rubn.base.ui;
+package com.rubn.xsdvalidator;
 
 import com.rubn.xsdvalidator.records.AppVersionRecord;
+import com.rubn.xsdvalidator.util.XsdValidatorConstants;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.Image;
@@ -40,7 +41,7 @@ public final class MainLayout extends AppLayout {
 
         final Span spanName = new Span(appVersionRecord.version());
         spanName.getElement().getThemeList().add("badge pill contrast");
-        spanName.getStyle().setBoxShadow(Constants.VAR_CUSTOM_BOX_SHADOW);
+        spanName.getStyle().setBoxShadow(XsdValidatorConstants.VAR_CUSTOM_BOX_SHADOW);
         spanName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.XXSMALL,
                 LumoUtility.TextColor.SECONDARY);
 

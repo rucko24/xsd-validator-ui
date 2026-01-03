@@ -1,15 +1,17 @@
-package com.rubn.base.ui.list;
+package com.rubn.xsdvalidator.view.list;
 
-import com.rubn.base.ui.Layout;
-import com.rubn.base.ui.Span;
+import com.rubn.xsdvalidator.view.Span;
+import com.rubn.xsdvalidator.util.Layout;
+import com.rubn.xsdvalidator.util.SvgFactory;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.icon.SvgIcon;
-import com.vaadin.flow.server.streams.DownloadHandler;
 import com.vaadin.flow.theme.lumo.LumoUtility.Background;
 import com.vaadin.flow.theme.lumo.LumoUtility.BorderRadius;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
+
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CURSOS_POINTER;
 
 public class FileListItem extends ListItem {
 
@@ -17,7 +19,7 @@ public class FileListItem extends ListItem {
         setHeight("40px");
         setId("file-list-item");
         addClassNames(Background.CONTRAST_5, BorderRadius.LARGE, Padding.Horizontal.SMALL);
-        getStyle().setCursor("pointer");
+        getStyle().setCursor(CURSOS_POINTER);
         removeClassName(Padding.Horizontal.MEDIUM);
 
         super.setPrefix(this.createFileIcon(prefixFileName.substring(prefixFileName.lastIndexOf('.') + 1)));
@@ -29,17 +31,16 @@ public class FileListItem extends ListItem {
         setGap(Layout.Gap.SMALL);
     }
 
-    private Component createFileIcon(String fileName) {
+    private Component createFileIcon(String paramfileName) {
 
         Layout corner = new Layout();
         corner.setSizeFull();
 
-        String pathFileName = fileName.contains("xml")
-                ? "/META-INF/resources/svg-images/file-xml-icon.svg"
-                : "/META-INF/resources/svg-images/file-xsd-icon.svg";
+        String fileName = paramfileName.contains("xml")
+                ? "file-xml-icon.svg"
+                : "file-xsd-icon.svg";
 
-        final DownloadHandler downloadHandler = DownloadHandler.forClassResource(getClass(), pathFileName);
-        SvgIcon icon = new SvgIcon(downloadHandler);
+        SvgIcon icon = SvgFactory.createIconFromSvg(fileName, "40px", null);
         icon.setSize("40px");
         corner.add(icon);
 

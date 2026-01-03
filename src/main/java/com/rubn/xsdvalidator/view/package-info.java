@@ -1,4 +1,4 @@
 @NullMarked
-package com.rubn.base.ui;
+package com.rubn.xsdvalidator.view;
 
 import org.jspecify.annotations.NullMarked;

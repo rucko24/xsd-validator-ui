@@ -1,7 +1,7 @@
-package com.rubn.base.ui.list;
+package com.rubn.xsdvalidator.view.list;
 
-import com.rubn.base.ui.Layout;
-import com.rubn.base.ui.utility.Color;
+import com.rubn.xsdvalidator.util.Layout;
+import com.rubn.xsdvalidator.util.Color;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasTheme;
 import com.vaadin.flow.component.Unit;

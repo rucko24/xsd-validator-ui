@@ -1,7 +1,5 @@
 package com.rubn.xsdvalidator.view;
 
-import com.rubn.base.ui.Input;
-import com.rubn.base.ui.ViewToolbar;
 import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Main;
@@ -13,7 +11,7 @@ import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 
-import static com.rubn.base.ui.Constants.COPY_TO_CLIPBOARD;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.COPY_TO_CLIPBOARD;
 
 @UIScope
 @SpringComponent
@@ -30,7 +28,6 @@ class XsdValidatorView extends Main {
 
         add(new ViewToolbar("XSD Validator", ViewToolbar.group(null)));
         add(new Input(validationXsdSchemaService));
-
     }
 
 }

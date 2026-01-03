@@ -13,7 +13,7 @@ import java.io.IOException;
  * @author rubn
  */
 @Configuration
-public class AppVersionPropertiesConfiguration {
+public class AppVersionConfiguration {
 
     @Bean
     public MavenStaxReader mavenXpp3Reader() {

@@ -1,9 +1,9 @@
-package com.rubn.base.ui;
+package com.rubn.xsdvalidator.util;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class Constants {
+public class XsdValidatorConstants {
 
     public static final String OK = "OK";
     public static final String INFORMATION = "Information";
@@ -30,5 +30,8 @@ public class Constants {
     public static final String CONTEXT_MENU_ITEM_NO_CHECKMARK = "context-menu-item-no-checkmark";
     public static final String VAR_CUSTOM_BOX_SHADOW = "var(--custom-box-shadow)";
     public static final String COPY_TO_CLIPBOARD = "./scripts/copy_to_clipboard.js";
+    public static final String CURSOS_POINTER = "pointer";
+    public static final String RESOURCES_SVG_IMAGES = "/META-INF/resources/svg-images/";
+    public static final String COPY_ALT_SVG = "copy-alt.svg";
 
 }

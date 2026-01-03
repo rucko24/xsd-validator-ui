@@ -1,4 +1,4 @@
-package com.rubn.xsdvalidator;
+package com.rubn.xsdvalidator.util;
 
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;

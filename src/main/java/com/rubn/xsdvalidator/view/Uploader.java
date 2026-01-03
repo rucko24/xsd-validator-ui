@@ -1,4 +1,4 @@
-package com.rubn.base.ui;
+package com.rubn.xsdvalidator.view;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.notification.Notification;

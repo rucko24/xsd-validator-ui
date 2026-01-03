@@ -1,4 +1,4 @@
-package com.rubn.base.ui.utility;
+package com.rubn.xsdvalidator.util;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -14,9 +14,9 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Objects;
 
-import static com.rubn.base.ui.Constants.INFORMATION;
-import static com.rubn.base.ui.Constants.OK;
-import static com.rubn.base.ui.Constants.WARNING;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.INFORMATION;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.OK;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.WARNING;
 
 /**
  * ConfirmDialogBuilder
