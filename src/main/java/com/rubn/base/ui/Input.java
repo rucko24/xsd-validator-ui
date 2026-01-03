@@ -157,6 +157,10 @@ public class Input extends Layout implements BeforeEnterObserver {
         Tooltip.forComponent(span).setText("Copy text");
         span.addClassNames(LumoUtility.FontSize.SMALL, TextColor.SECONDARY);
         span.getStyle().setBorderBottom(BORDER_BOTTOM_COLOR);
+        span.addClickListener(event -> {
+            UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, span.getText());
+            Notification.show("Error copied!", 2000, Notification.Position.BOTTOM_CENTER);
+        });
         return span;
     }
 
@@ -218,10 +222,6 @@ public class Input extends Layout implements BeforeEnterObserver {
 //        final SvgIcon icon = new SvgIcon(DownloadHandler.forClassResource(getClass(),
 //                "/META-INF/resources/svg-images/copy-alt.svg" + "copy-alt.svg"));
 //        icon.setSize("25px");
-        span.addClickListener(event -> {
-            UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, span.getText());
-            Notification.show("Error copied!", 2000, Notification.Position.BOTTOM_CENTER);
-        });
         verticalLayoutArea.add(span);
         verticalLayoutArea.scrollIntoView(ScrollIntoViewOption.Behavior.SMOOTH);
     }

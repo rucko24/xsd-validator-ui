@@ -29,4 +29,6 @@ public class Constants {
     public static final String WINDOW_COPY_TO_CLIPBOARD = "window.copyToClipboard($0)";
     public static final String CONTEXT_MENU_ITEM_NO_CHECKMARK = "context-menu-item-no-checkmark";
     public static final String VAR_CUSTOM_BOX_SHADOW = "var(--custom-box-shadow)";
+    public static final String COPY_TO_CLIPBOARD = "./scripts/copy_to_clipboard.js";
+
 }
