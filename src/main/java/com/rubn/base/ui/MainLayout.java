@@ -30,6 +30,7 @@ public final class MainLayout extends AppLayout {
 
     private Component createHeader() {
         final Image logo = new Image("logo.png", "logo");
+        logo.addClassName("logo");
         Tooltip.forComponent(logo).setText("https://github.com/rucko24/xsd-validator-ui");
         logo.getStyle().setCursor("pointer");
         logo.setWidth("50%");

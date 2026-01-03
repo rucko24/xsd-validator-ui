@@ -13,7 +13,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -31,8 +30,8 @@ public class ValidationXsdSchemaService {
 
     private Mono<Schema> loadSchema(final InputStream inputXsdSchema) {
         final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        try {
-            return Mono.just(schemaFactory.newSchema(this.buildStreamSource(inputXsdSchema)));
+        try (var bufferedInputStream = new BufferedInputStream(inputXsdSchema)) {
+            return Mono.just(schemaFactory.newSchema(new StreamSource(bufferedInputStream)));
         } catch (Exception ex) {
             return Mono.error(ex);
         }
@@ -47,24 +46,12 @@ public class ValidationXsdSchemaService {
     private Mono<List<String>> buildValidator(Tuple2<Validator, XmlValidationErrorHandler> tuple, InputStream inputXml) {
         final Validator validator = tuple.getT1();
         final XmlValidationErrorHandler xmlValidationErrorHandler = tuple.getT2();
-        try {
-            validator.validate(this.buildStreamSource(inputXml));
+        try (var bufferedInputStream = new BufferedInputStream(inputXml)) {
+            validator.validate(new StreamSource(bufferedInputStream));
             return Mono.just(xmlValidationErrorHandler.getExceptions());
         } catch (Exception e) {
             return Mono.error(e);
         }
-    }
-
-    /**
-     *
-     * Desde una ruta la validacion es mejor
-     *
-     * @param inputXml
-     * @return StreamSource
-     * @throws IOException
-     */
-    private StreamSource buildStreamSource(InputStream inputXml) {
-        return new StreamSource(new BufferedInputStream(inputXml));
     }
 
 }

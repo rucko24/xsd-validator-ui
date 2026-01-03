@@ -9,7 +9,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.ListStyleType;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 
-public class List extends com.vaadin.flow.component.html.UnorderedList implements HasTheme {
+public class ListCustom extends com.vaadin.flow.component.html.UnorderedList implements HasTheme {
 
     // Style
     private Color.Background background;
@@ -19,7 +19,7 @@ public class List extends com.vaadin.flow.component.html.UnorderedList implement
     private Layout.RowGap rowGap;
     private Layout.Overflow overflow;
 
-    public List() {
+    public ListCustom() {
         addClassNames(ListStyleType.NONE, Margin.Vertical.NONE, Padding.Start.NONE);
         setDisplay(Layout.Display.GRID);
     }

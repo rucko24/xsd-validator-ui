@@ -9,7 +9,6 @@ public class Constants {
     public static final String INFORMATION = "Information";
     public static final String WARNING = "Warning";
     public static final String BORDER_BOTTOM_COLOR = "1px solid var(--lumo-contrast-10pct)";
-
     public static final String SCROLLBAR_CUSTOM_STYLE = """
                 const style = document.createElement('style');
                 style.textContent = `
@@ -28,5 +27,6 @@ public class Constants {
                 this.appendChild(style);
             """;
     public static final String WINDOW_COPY_TO_CLIPBOARD = "window.copyToClipboard($0)";
-
+    public static final String CONTEXT_MENU_ITEM_NO_CHECKMARK = "context-menu-item-no-checkmark";
+    public static final String VAR_CUSTOM_BOX_SHADOW = "var(--custom-box-shadow)";
 }

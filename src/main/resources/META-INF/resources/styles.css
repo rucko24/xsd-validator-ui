@@ -1,0 +1,55 @@
+
+html {
+  --custom-box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 1px 3px 0 rgba(0, 0, 0, .12);
+  --custom-image-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px, rgba(0, 0, 0, 0.19) 0px 6px 20px;
+}
+
+.span-shadow {
+    box-shadow: var(--custom-box-shadow);
+}
+
+.logo {
+    box-shadow: var(--custom-image-shadow);
+}
+
+vaadin-context-menu-item.context-menu-item-no-checkmark {
+  padding-left: var(--lumo-space-s);
+  justify-content: flex-start;
+}
+
+vaadin-context-menu-item.context-menu-item-no-checkmark:hover {
+  color: #d50018;
+  background-color: rgba(184,5,49, .08);
+}
+
+vaadin-context-menu-item.context-menu-item-no-checkmark::part(checkmark)::before {
+  display: none;
+}
+
+vaadin-context-menu-item.context-menu-item-no-checkmark[focused] {
+    box-shadow: none;
+}
+
+vaadin-context-menu-item[focused] {
+   box-shadow: none;
+}
+
+vaadin-upload.esptool-homepath-upload {
+  border: none;
+  overflow: visible;
+  height: 39px;
+  padding: 0px;
+  margin-right: 1px;
+}
+
+vaadin-upload.upload-xml-xsd vaadin-upload-file::part(row) {
+
+}
+
+vaadin-upload.upload-xml-xsd::part(drop-label) {
+
+}
+
+vaadin-upload.upload-xml-xsd::host(:not([nodrop])) {
+
+}
