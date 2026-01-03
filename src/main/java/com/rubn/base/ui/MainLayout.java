@@ -39,7 +39,10 @@ public final class MainLayout extends AppLayout {
         });
 
         final Span spanName = new Span(appVersionRecord.version());
-        spanName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.XXSMALL, LumoUtility.TextColor.SECONDARY);
+        spanName.getElement().getThemeList().add("badge pill contrast");
+        spanName.getStyle().setBoxShadow(Constants.VAR_CUSTOM_BOX_SHADOW);
+        spanName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.XXSMALL,
+                LumoUtility.TextColor.SECONDARY);
 
         var header = new VerticalLayout(logo, spanName);
         header.setAlignItems(FlexComponent.Alignment.CENTER);
