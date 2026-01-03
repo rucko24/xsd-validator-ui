@@ -2,6 +2,7 @@ package com.rubn.xsdvalidator.service;
 
 import com.rubn.xsdvalidator.XmlValidationErrorHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,6 +16,7 @@ import javax.xml.validation.Validator;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -48,10 +50,17 @@ public class ValidationXsdSchemaService {
         final XmlValidationErrorHandler xmlValidationErrorHandler = tuple.getT2();
         try (var bufferedInputStream = new BufferedInputStream(inputXml)) {
             validator.validate(new StreamSource(bufferedInputStream));
-            return Mono.just(xmlValidationErrorHandler.getExceptions());
+            return Mono.just(this.detectWords(xmlValidationErrorHandler.getExceptions()));
         } catch (Exception e) {
             return Mono.error(e);
         }
+    }
+
+    private List<String> detectWords(List<String> exceptions) {
+        return exceptions
+                .stream()
+                .flatMap(item -> Stream.of(item.split(StringUtils.SPACE)))
+                .toList();
     }
 
 }

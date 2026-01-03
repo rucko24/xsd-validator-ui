@@ -6,7 +6,9 @@ import com.rubn.base.ui.list.ListCustom;
 import com.rubn.base.ui.utility.ConfirmDialogBuilder;
 import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ScrollIntoViewOption;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
@@ -65,6 +67,10 @@ public class Input extends Layout implements BeforeEnterObserver {
      * Service
      */
     private final ValidationXsdSchemaService validationXsdSchemaService;
+    /**
+     * Mutable fields
+     */
+    private Span span;
 
     public Input(final ValidationXsdSchemaService validationXsdSchemaService) {
         this.validationXsdSchemaService = validationXsdSchemaService;
@@ -89,6 +95,9 @@ public class Input extends Layout implements BeforeEnterObserver {
             verticalLayoutArea.removeAll();
             verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
         }).addClassName(CONTEXT_MENU_ITEM_NO_CHECKMARK);
+
+        //Build error span
+        this.span = this.buildErrorSpan();
 
         // Actions
         attachment = new Button(VaadinIcon.UPLOAD.create());
@@ -142,6 +151,15 @@ public class Input extends Layout implements BeforeEnterObserver {
         add(list, verticalLayoutArea, actions);
     }
 
+    private Span buildErrorSpan() {
+        final Span span = new Span();
+        span.getStyle().setCursor("pointer");
+        Tooltip.forComponent(span).setText("Copy text");
+        span.addClassNames(LumoUtility.FontSize.SMALL, TextColor.SECONDARY);
+        span.getStyle().setBorderBottom(BORDER_BOTTOM_COLOR);
+        return span;
+    }
+
     private void validate() {
         String[] sortedNamesByExtension = mapPrefixFileNameAndContent.keySet()
                 .stream()
@@ -162,11 +180,11 @@ public class Input extends Layout implements BeforeEnterObserver {
                         this.resetInputStream();
                     });
                 })
-                .delayElements(Duration.ofMillis(700), Schedulers.boundedElastic())
+                .delayElements(Duration.ofMillis(50), Schedulers.boundedElastic())
                 .subscribe(listConstaintErrors -> {
                     this.executeUI(() -> {
                         if (!listConstaintErrors.isEmpty()) {
-                            log.info("Error: " + listConstaintErrors);
+                            log.info(listConstaintErrors);
                             this.buildCustomSpan(listConstaintErrors);
                             this.resetInputStream();
                         } else {
@@ -191,11 +209,12 @@ public class Input extends Layout implements BeforeEnterObserver {
     }
 
     private void buildCustomSpan(String listConstaintErrors) {
-        final Span span = new Span(listConstaintErrors);
-        span.getStyle().setCursor("pointer");
-        Tooltip.forComponent(span).setText("copy text");
-        span.addClassNames(LumoUtility.FontSize.SMALL, TextColor.SECONDARY);
-        span.getStyle().setBorderBottom(BORDER_BOTTOM_COLOR);
+        if(listConstaintErrors.equals("ERROR:")
+                ||  listConstaintErrors.equals("WARNING:") || listConstaintErrors.equals("FATAL:")) {
+            span = this.buildErrorSpan();
+        }
+        span.setText(span.getText().concat(listConstaintErrors).concat(" "));
+        Animated.animate(span, Animated.Animation.FADE_IN);
 //        final SvgIcon icon = new SvgIcon(DownloadHandler.forClassResource(getClass(),
 //                "/META-INF/resources/svg-images/copy-alt.svg" + "copy-alt.svg"));
 //        icon.setSize("25px");
@@ -204,12 +223,14 @@ public class Input extends Layout implements BeforeEnterObserver {
             Notification.show("Error copied!", 2000, Notification.Position.BOTTOM_CENTER);
         });
         verticalLayoutArea.add(span);
-        Animated.animate(span, Animated.Animation.FADE_IN);
+        verticalLayoutArea.scrollIntoView(ScrollIntoViewOption.Behavior.SMOOTH);
     }
 
     private void executeUI(Command command) {
         super.getUI().ifPresent(ui -> {
-            ui.access(command);
+            try {
+                ui.access(command);
+            } catch (UIDetachedException ex) {}
         });
     }
 
