@@ -42,14 +42,12 @@ vaadin-upload.esptool-homepath-upload {
   margin-right: 1px;
 }
 
-vaadin-upload.upload-xml-xsd vaadin-upload-file::part(row) {
-
+/* Ocultar solo la lista de archivos */
+vaadin-upload.upload-xml-xsd::part(file-list) {
+  display: none;
 }
 
-vaadin-upload.upload-xml-xsd::part(drop-label) {
-
-}
-
-vaadin-upload.upload-xml-xsd::host(:not([nodrop])) {
-
+/* O si usas el shadow DOM */
+vaadin-upload.upload-xml-xsd vaadin-upload-file-list {
+  display: none;
 }

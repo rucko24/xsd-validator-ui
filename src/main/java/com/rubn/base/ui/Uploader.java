@@ -39,4 +39,9 @@ public class Uploader extends Upload {
         });
     }
 
+    @Override
+    public void clearFileList() {
+        getElement().executeJs("this.files = [];" + "return this.files;");
+    }
+
 }

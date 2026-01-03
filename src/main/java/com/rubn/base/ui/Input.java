@@ -17,7 +17,6 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.dom.Style;
-import com.vaadin.flow.internal.JacksonUtils;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.server.Command;
@@ -63,6 +62,7 @@ public class Input extends Layout implements BeforeEnterObserver {
     private final Button buttonCleanFileList;
     /**
      * Service
+     *
      * @param validationXsdSchemaService
      */
     private final ValidationXsdSchemaService validationXsdSchemaService;
@@ -111,7 +111,6 @@ public class Input extends Layout implements BeforeEnterObserver {
         this.buttonCleanFileList = new Button(VaadinIcon.TRASH.create());
         this.buttonCleanFileList.addClickListener(event -> {
             uploader.clearFileList();
-            uploader.getElement().setPropertyJson("files", JacksonUtils.createArrayNode());
         });
 
         validateButton = new Button("Validate", VaadinIcon.CHECK.create());
@@ -220,11 +219,11 @@ public class Input extends Layout implements BeforeEnterObserver {
                         ConfirmDialogBuilder.showWarning(e.getMessage());
                     }
                 })
-                .whenStart(() -> log.info("Upload started"))
-                .whenComplete((transferContext, aBoolean) -> {
+                .whenStart(() -> {
+                    log.info("Upload started");
                     this.uploader.clearFileList();
-                    log.info("Upload complete");
-                });
+                })
+                .whenComplete((transferContext, aBoolean) -> log.info("Upload complete"));
     }
 
     private void processFile(final UploadMetadata uploadMetadata, InputStream inputStream) {
@@ -248,6 +247,7 @@ public class Input extends Layout implements BeforeEnterObserver {
                         .addConfirmListener(confirm -> {
                             list.remove(fileListItem);
                             mapPrefixFileNameAndContent.remove(fileName, inputStream);
+                            this.uploader.clearFileList();
                         });
             });
         }).addClassName(CONTEXT_MENU_ITEM_NO_CHECKMARK);
