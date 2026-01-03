@@ -10,6 +10,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -62,8 +63,6 @@ public class Input extends Layout implements BeforeEnterObserver {
     private final Button buttonCleanFileList;
     /**
      * Service
-     *
-     * @param validationXsdSchemaService
      */
     private final ValidationXsdSchemaService validationXsdSchemaService;
 
@@ -104,6 +103,17 @@ public class Input extends Layout implements BeforeEnterObserver {
         list.setDisplay(Display.FLEX);
         list.setGap(Gap.SMALL);
         list.removeBackgroundColor();
+        final Button buttonClearAll = new  Button(new Icon("lumo","cross"));
+        buttonClearAll.setTooltipText("Clear files!");
+        buttonClearAll.getStyle().setCursor("pointer");
+        buttonClearAll.addClassNames(Margin.Left.AUTO, "close-button-hover");
+        buttonClearAll.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE);
+        buttonClearAll.addClickListener(event -> {
+           list.removeAll();
+            mapPrefixFileNameAndContent.clear();
+            list.add(buttonClearAll);
+        });
+        list.add(buttonClearAll);
 
         this.uploader = new Uploader(attachment);
         this.uploader.setUploadHandler(this.buildUploadHandler());

@@ -5,6 +5,7 @@ import com.rubn.base.ui.utility.Color;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasTheme;
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.theme.lumo.LumoUtility.ListStyleType;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
@@ -22,6 +23,9 @@ public class ListCustom extends com.vaadin.flow.component.html.UnorderedList imp
     public ListCustom() {
         addClassNames(ListStyleType.NONE, Margin.Vertical.NONE, Padding.Start.NONE);
         setDisplay(Layout.Display.GRID);
+        getStyle().setAlignItems(Style.AlignItems.START);
+        getStyle().setFlexDirection(Style.FlexDirection.ROW_REVERSE);
+        getStyle().setJustifyContent(Style.JustifyContent.START);
     }
 
     public void add(Component... components) {
