@@ -101,3 +101,18 @@ vaadin-upload.upload-xml-xsd vaadin-upload-file-list {
     display: inline-block; /* Necesario para transform */
     margin-right: 4px; /* Espacio entre palabras */
 }
+
+vaadin-menu-bar-item.menu-item-no-checkmark::part(checkmark)::before {
+  display: none;
+}
+
+/* some indent for the content */
+vaadin-menu-bar-item.menu-item-no-checkmark {
+  padding-left: var(--lumo-space-s);
+  justify-content: flex-start;
+}
+
+vaadin-menu-bar-item.menu-item-no-checkmark:hover {
+  transition: .4s;
+  /*background-color: var(--lumo-primary-color-10pct)*/
+}

@@ -13,8 +13,10 @@ import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
-import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -51,6 +53,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.BORDER_BOTTOM_COLOR;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CONTEXT_MENU_ITEM_NO_CHECKMARK;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.MENU_ITEM_NO_CHECKMARK;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.SCROLLBAR_CUSTOM_STYLE;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.VAR_CUSTOM_BOX_SHADOW;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.WINDOW_COPY_TO_CLIPBOARD;
@@ -126,17 +129,29 @@ public class Input extends Layout implements BeforeEnterObserver {
         list.setGap(Gap.SMALL);
         list.removeBackgroundColor();
 
-        final Button buttonClearAll = new Button(new Icon("lumo", "cross"));
-        buttonClearAll.setTooltipText("Clear files!");
-        buttonClearAll.getStyle().setCursor(XsdValidatorConstants.CURSOS_POINTER);
-        buttonClearAll.addClassNames(Margin.Left.AUTO, "close-button-hover");
-        buttonClearAll.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE);
-        buttonClearAll.addClickListener(event -> {
+        final Button buttonClearAll = new Button(VaadinIcon.ELLIPSIS_V.create());
+        buttonClearAll.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+
+        final MenuBar menuBarGridOptions = new MenuBar();
+        Tooltip.forComponent(menuBarGridOptions).setText("Options");
+        menuBarGridOptions.setThemeName("tertiary-inline contrast");
+        menuBarGridOptions.addThemeVariants(MenuBarVariant.LUMO_SMALL);
+        menuBarGridOptions.addClassName(Margin.Left.AUTO);
+
+        final MenuItem itemEllipsis = menuBarGridOptions.addItem("");
+        itemEllipsis.add(buttonClearAll);
+        list.add(menuBarGridOptions);
+
+        itemEllipsis.getSubMenu().addItem(this.createRowItemWithVaadinIcon("Clean errors!", VaadinIcon.TRASH), event -> {
+            verticalLayoutArea.removeAll();
+            verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
+        }).addClassName(MENU_ITEM_NO_CHECKMARK);
+
+        itemEllipsis.getSubMenu().addItem(this.createRowItemWithVaadinIcon("Clear files!", VaadinIcon.TRASH), event -> {
             list.removeAll();
             mapPrefixFileNameAndContent.clear();
-            list.add(buttonClearAll);
-        });
-        list.add(buttonClearAll);
+            list.add(menuBarGridOptions);
+        }).addClassName(MENU_ITEM_NO_CHECKMARK);
 
         this.uploader = new Uploader(attachment);
         this.uploader.setUploadHandler(this.buildUploadHandler());

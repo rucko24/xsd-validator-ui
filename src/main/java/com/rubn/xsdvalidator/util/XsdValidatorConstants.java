@@ -33,5 +33,6 @@ public class XsdValidatorConstants {
     public static final String CURSOS_POINTER = "pointer";
     public static final String RESOURCES_SVG_IMAGES = "/META-INF/resources/svg-images/";
     public static final String COPY_ALT_SVG = "copy-alt.svg";
+    public static final String MENU_ITEM_NO_CHECKMARK = "menu-item-no-checkmark";
 
 }
