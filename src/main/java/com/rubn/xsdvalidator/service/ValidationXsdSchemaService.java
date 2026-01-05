@@ -18,6 +18,9 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * @author rubn
+ */
 @Slf4j
 @Service
 public class ValidationXsdSchemaService {

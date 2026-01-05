@@ -16,8 +16,7 @@
     text-overflow: ellipsis !important;
 }
 
-/* Evita que las imágenes/iconos se arrastren como fantasmas */
 .file-list-item img,
 .file-list-item svg {
-    pointer-events: none; /* El clic traspasa el icono y llega a la tarjeta */
+    pointer-events: none;
 }

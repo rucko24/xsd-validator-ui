@@ -1,9 +1,7 @@
-/* Ocultar solo la lista de archivos */
 vaadin-upload.upload-xml-xsd::part(file-list) {
   display: none;
 }
 
-/* O si usas el shadow DOM */
 vaadin-upload.upload-xml-xsd vaadin-upload-file-list {
   display: none;
 }
