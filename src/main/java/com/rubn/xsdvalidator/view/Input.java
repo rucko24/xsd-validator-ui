@@ -4,7 +4,6 @@ import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
 import com.rubn.xsdvalidator.util.ConfirmDialogBuilder;
 import com.rubn.xsdvalidator.util.Layout;
 import com.rubn.xsdvalidator.util.SvgFactory;
-import com.rubn.xsdvalidator.util.XsdValidatorConstants;
 import com.rubn.xsdvalidator.view.list.CustomList;
 import com.rubn.xsdvalidator.view.list.FileListItem;
 import com.vaadin.flow.component.Component;
@@ -27,7 +26,6 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
-import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.server.Command;
@@ -44,8 +42,6 @@ import com.vaadin.flow.theme.lumo.LumoUtility.BorderRadius;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
-import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
@@ -106,10 +102,7 @@ public class Input extends Layout implements BeforeEnterObserver {
 
         // Text area
         verticalLayoutArea = new VerticalLayout();
-        verticalLayoutArea.getStyle().setCursor(XsdValidatorConstants.CURSOS_POINTER);
-        verticalLayoutArea.setHeight("350px");
-        verticalLayoutArea.addClassNames(Padding.NONE, Width.FULL);
-        verticalLayoutArea.getStyle().setOverflow(Style.Overflow.AUTO);
+        verticalLayoutArea.addClassNames("vertical-area");
         verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
         final ContextMenu contextMenu = this.buildContextMenu(verticalLayoutArea);
         contextMenu.addItem(this.createRowItemWithIcon("Clean errors!", VaadinIcon.TRASH.create(), "15px"), event -> {
@@ -120,10 +113,9 @@ public class Input extends Layout implements BeforeEnterObserver {
         //Build error span
         this.errorSpan = this.buildErrorSpan();
 
-        // Actions
+        // attachment upload button
         attachment = new Button(VaadinIcon.UPLOAD.create());
-        attachment.addClassNames(Background.TRANSPARENT, Border.ALL, BorderColor.CONTRAST_20, BorderRadius.FULL,
-                Margin.Vertical.NONE, Padding.NONE, TextColor.SECONDARY);
+        attachment.addClassName("attachment");
         attachment.addThemeVariants(ButtonVariant.LUMO_SMALL);
         attachment.setAriaLabel("Attachment");
         attachment.setTooltipText("Attachment");
@@ -139,7 +131,7 @@ public class Input extends Layout implements BeforeEnterObserver {
         this.uploader.setUploadHandler(this.buildUploadHandler());
 
         validateButton = new Button("Validate", VaadinIcon.CHECK.create());
-        validateButton.addClassNames(BorderRadius.LARGE, Margin.NONE, Padding.SMALL);
+        validateButton.addClassName("validate-button");
         validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         validateButton.setAriaLabel("Validate");
         validateButton.setTooltipText("validate");
@@ -377,9 +369,9 @@ public class Input extends Layout implements BeforeEnterObserver {
 
     private String textProcessing() {
         return String.join(" ", this.allErrorsList
-                .stream()
-                .map(item -> item.equals(StringUtils.LF) ? item.concat(StringUtils.LF) : item)
-                .toList())
+                        .stream()
+                        .map(item -> item.equals(StringUtils.LF) ? item.concat(StringUtils.LF) : item)
+                        .toList())
                 .trim();
     }
 

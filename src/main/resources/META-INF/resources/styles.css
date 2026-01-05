@@ -4,7 +4,7 @@
 @import url("./styles/custom-list.css");
 @import url("./styles/file-list-item.css");
 @import url("./styles/upload.css");
-@import url("./styles/anchor-downloader.css");
+@import url("./styles/input-view.css");
 
 html {
   --custom-box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 1px 3px 0 rgba(0, 0, 0, .12);
