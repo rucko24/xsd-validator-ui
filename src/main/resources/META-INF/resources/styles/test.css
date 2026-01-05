@@ -1,0 +1,78 @@
+.span-shadow {
+    box-shadow: var(--custom-box-shadow);
+}
+
+.logo {
+    box-shadow: var(--custom-image-shadow);
+}
+
+vaadin-context-menu-item.context-menu-item-no-checkmark {
+  padding-left: var(--lumo-space-s);
+  justify-content: flex-start;
+}
+
+vaadin-context-menu-item.context-menu-item-no-checkmark:hover {
+  color: #d50018;
+  background-color: var(--red-error-color);
+}
+
+vaadin-context-menu-item.context-menu-item-no-checkmark::part(checkmark)::before {
+  display: none;
+}
+
+vaadin-context-menu-item.context-menu-item-no-checkmark[focused] {
+    box-shadow: none;
+}
+
+vaadin-context-menu-item[focused] {
+   box-shadow: none;
+}
+
+.close-button-hover:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-radius: 15px;
+  transition: background-color 0.2s ease;
+}
+
+.copy-button-hover:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+  border-radius: 15px;
+  transition: background-color 0.2s ease;
+  --lumo-button-size: var(lumo-size-small);
+}
+
+.icon-hover-effect {
+    padding: 4px;
+    border-radius: 50%; /
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.icon-hover-effect:hover {
+    background-color: rgba(128, 128, 128, 0.2); /* Grisáceo con transparencia */
+}
+
+vaadin-menu-bar-item.menu-item-no-checkmark::part(checkmark)::before {
+  display: none;
+}
+
+vaadin-menu-bar-item.menu-item-no-checkmark {
+  padding-left: var(--lumo-space-s);
+  justify-content: flex-start;
+}
+
+vaadin-menu-bar-item.delete:hover {
+  background-color: var(--red-error-color);
+  color: #d50018;
+}
+
+.div-files-wrapper {
+    display: flex;
+    align-items: start;
+    width: 100%;
+}
+
+.fixed-menu {
+    flex-shrink: 0;
+    margin-left: 8px;
+}

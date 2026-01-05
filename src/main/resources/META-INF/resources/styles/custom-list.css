@@ -1,0 +1,31 @@
+.custom-list-scroll {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    width: 100%;
+    min-width: 0 !important;
+    flex-grow: 1;
+    gap: 10px;
+    padding-bottom: 5px;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.custom-list-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.custom-list-scroll::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 4px;
+}
+
+.custom-list-scroll.grabbing {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+}

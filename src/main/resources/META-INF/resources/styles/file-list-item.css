@@ -1,0 +1,23 @@
+.file-list-item {
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    width: auto !important;
+    height: 55px !important;
+    max-width: 300px;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box;
+}
+
+.file-list-item span {
+    width: 120px;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Evita que las imágenes/iconos se arrastren como fantasmas */
+.file-list-item img,
+.file-list-item svg {
+    pointer-events: none; /* El clic traspasa el icono y llega a la tarjeta */
+}
