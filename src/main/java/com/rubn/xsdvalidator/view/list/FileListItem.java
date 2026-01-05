@@ -1,30 +1,30 @@
 package com.rubn.xsdvalidator.view.list;
 
-import com.rubn.xsdvalidator.view.Span;
 import com.rubn.xsdvalidator.util.Layout;
 import com.rubn.xsdvalidator.util.SvgFactory;
+import com.rubn.xsdvalidator.view.Span;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.icon.SvgIcon;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.theme.lumo.LumoUtility.Background;
 import com.vaadin.flow.theme.lumo.LumoUtility.BorderRadius;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 
-import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CURSOS_POINTER;
-
 public class FileListItem extends ListItem {
 
     public FileListItem(String prefixFileName, String contentFileSize) {
-        setHeight("40px");
-        setId("file-list-item");
-        addClassNames(Background.CONTRAST_5, BorderRadius.LARGE, Padding.Horizontal.SMALL);
-        getStyle().setCursor(CURSOS_POINTER);
-        removeClassName(Padding.Horizontal.MEDIUM);
+        addClassName("file-list-item");
+        addClassNames(Background.CONTRAST_5, BorderRadius.LARGE, Padding.Vertical.SMALL, Padding.Horizontal.SMALL);
 
         super.setPrefix(this.createFileIcon(prefixFileName.substring(prefixFileName.lastIndexOf('.') + 1)));
 
-        setPrimary(new Span(prefixFileName, FontSize.XSMALL));
+        final Span spanPrefixName = new Span(prefixFileName, FontSize.XSMALL);
+        Tooltip tooltip = Tooltip.forComponent(spanPrefixName);
+        tooltip.setText(prefixFileName);
+        tooltip.setPosition(Tooltip.TooltipPosition.TOP);
+        setPrimary(spanPrefixName);
         setSecondary(new Span(contentFileSize, FontSize.XXSMALL));
         this.column.removeClassName(Padding.Vertical.XSMALL);
 
@@ -38,7 +38,7 @@ public class FileListItem extends ListItem {
 
         String fileName = paramfileName.contains("xml")
                 ? "file-xml-icon.svg"
-                : "file-xsd-icon.svg";
+                : "xsd.svg";
 
         SvgIcon icon = SvgFactory.createIconFromSvg(fileName, "40px", null);
         icon.setSize("40px");

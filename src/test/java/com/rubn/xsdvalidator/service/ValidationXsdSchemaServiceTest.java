@@ -18,7 +18,7 @@ import java.nio.file.Path;
 class ValidationXsdSchemaServiceTest {
 
     private static final Path PAIN_MOCK_PATH = Path.of("src/main/resources/documents/.xml");
-    private static final Path XSD_MOCK_PATH = Path.of("src/main/resources/documents/schema-xml.xsd");
+    private static final Path XSD_MOCK_PATH = Path.of("src/main/resources/documents/");
 
     @InjectMocks
     private ValidationXsdSchemaService validationXsdSchemaService;

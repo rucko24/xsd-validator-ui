@@ -3,17 +3,20 @@ package com.rubn.xsdvalidator.view;
 import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
 import com.rubn.xsdvalidator.util.ConfirmDialogBuilder;
 import com.rubn.xsdvalidator.util.Layout;
+import com.rubn.xsdvalidator.util.SvgFactory;
 import com.rubn.xsdvalidator.util.XsdValidatorConstants;
+import com.rubn.xsdvalidator.view.list.CustomList;
 import com.rubn.xsdvalidator.view.list.FileListItem;
-import com.rubn.xsdvalidator.view.list.ListCustom;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ScrollIntoViewOption;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.icon.AbstractIcon;
+import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
@@ -41,7 +44,6 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.ByteArrayInputStream;
@@ -53,6 +55,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.BORDER_BOTTOM_COLOR;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CONTEXT_MENU_ITEM_NO_CHECKMARK;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CURSOS_POINTER;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.DELETE_MENU_ITEM_NO_CHECKMARK;
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.JS_COMMAND;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.MENU_ITEM_NO_CHECKMARK;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.SCROLLBAR_CUSTOM_STYLE;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.VAR_CUSTOM_BOX_SHADOW;
@@ -66,7 +71,7 @@ public class Input extends Layout implements BeforeEnterObserver {
     private final VerticalLayout verticalLayoutArea;
     private final Button attachment;
     private final Button validateButton;
-    private final ListCustom list;
+    private final CustomList customList;
     private final Uploader uploader;
     private final Button buttonCleanFileList;
     /**
@@ -97,7 +102,7 @@ public class Input extends Layout implements BeforeEnterObserver {
         verticalLayoutArea.getStyle().setOverflow(Style.Overflow.AUTO);
         verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
         final ContextMenu contextMenu = this.buildContextMenu(verticalLayoutArea);
-        contextMenu.addItem(this.createRowItemWithVaadinIcon("Clean errors!", VaadinIcon.TRASH), event -> {
+        contextMenu.addItem(this.createRowItemWithIcon("Clean errors!", VaadinIcon.TRASH.create(), "15px"), event -> {
             verticalLayoutArea.removeAll();
             verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
         }).addClassName(CONTEXT_MENU_ITEM_NO_CHECKMARK);
@@ -123,35 +128,10 @@ public class Input extends Layout implements BeforeEnterObserver {
         attachment.setAriaLabel("Attachment");
         attachment.setTooltipText("Attachment");
 
-        this.list = new ListCustom();
-        list.setFlexWrap(FlexWrap.WRAP);
-        list.setDisplay(Display.FLEX);
-        list.setGap(Gap.SMALL);
-        list.removeBackgroundColor();
-
-        final Button buttonClearAll = new Button(VaadinIcon.ELLIPSIS_V.create());
-        buttonClearAll.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-
-        final MenuBar menuBarGridOptions = new MenuBar();
-        Tooltip.forComponent(menuBarGridOptions).setText("Options");
-        menuBarGridOptions.setThemeName("tertiary-inline contrast");
-        menuBarGridOptions.addThemeVariants(MenuBarVariant.LUMO_SMALL);
-        menuBarGridOptions.addClassName(Margin.Left.AUTO);
-
-        final MenuItem itemEllipsis = menuBarGridOptions.addItem("");
-        itemEllipsis.add(buttonClearAll);
-        list.add(menuBarGridOptions);
-
-        itemEllipsis.getSubMenu().addItem(this.createRowItemWithVaadinIcon("Clean errors!", VaadinIcon.TRASH), event -> {
-            verticalLayoutArea.removeAll();
-            verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
-        }).addClassName(MENU_ITEM_NO_CHECKMARK);
-
-        itemEllipsis.getSubMenu().addItem(this.createRowItemWithVaadinIcon("Clear files!", VaadinIcon.TRASH), event -> {
-            list.removeAll();
-            mapPrefixFileNameAndContent.clear();
-            list.add(menuBarGridOptions);
-        }).addClassName(MENU_ITEM_NO_CHECKMARK);
+        this.customList = new CustomList();
+        MenuBar menuBar = this.buildMenuBarOptions();
+        final Div divHeader = new Div(customList, menuBar);
+        divHeader.addClassName("div-files-wrapper");
 
         this.uploader = new Uploader(attachment);
         this.uploader.setUploadHandler(this.buildUploadHandler());
@@ -179,7 +159,58 @@ public class Input extends Layout implements BeforeEnterObserver {
         actions.setJustifyContent(JustifyContent.BETWEEN);
         actions.setAlignItems(AlignItems.CENTER);
 
-        add(list, verticalLayoutArea, actions);
+        add(divHeader, verticalLayoutArea, actions);
+    }
+
+    private MenuBar buildMenuBarOptions() {
+        final Button buttonClearAll = new Button(VaadinIcon.ELLIPSIS_V.create());
+        buttonClearAll.getStyle().setCursor(CURSOS_POINTER);
+        buttonClearAll.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+
+        final MenuBar menuBarGridOptions = new MenuBar();
+        menuBarGridOptions.addClassName("fixed-menu");
+        var tooltip = Tooltip.forComponent(buttonClearAll);
+        tooltip.setPosition(Tooltip.TooltipPosition.START_TOP);
+        tooltip.setText("Options");
+        menuBarGridOptions.setThemeName("tertiary-inline contrast");
+        menuBarGridOptions.addThemeVariants(MenuBarVariant.LUMO_SMALL);
+        menuBarGridOptions.addClassName(Margin.Left.AUTO);
+
+        final MenuItem itemEllipsis = menuBarGridOptions.addItem("");
+        itemEllipsis.add(buttonClearAll);
+
+        itemEllipsis.getSubMenu().addItem(this.createRowItemWithIcon("Download text",
+                VaadinIcon.DOWNLOAD.create(), "18px"), event -> {
+
+        }).addClassNames(MENU_ITEM_NO_CHECKMARK);
+
+        SvgIcon svgIcon = SvgFactory.createCopyButtonFromSvg();
+        svgIcon.getStyle().setMarginLeft("-5px");
+        svgIcon.getStyle().setMarginBottom("-6px");
+        var row = this.createRowItemWithIcon("Copy all text", svgIcon, "25px");
+        row.getStyle().setGap("0.2em");
+        row.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.BASELINE);
+        MenuItem itemDelete = itemEllipsis.getSubMenu().addItem(row, event -> {
+
+        });
+        itemDelete.addClassNames(MENU_ITEM_NO_CHECKMARK);
+        itemDelete.getStyle().setPaddingBottom("10px");
+
+        itemEllipsis.getSubMenu().addSeparator();
+
+        itemEllipsis.getSubMenu().addItem(this.createRowItemWithIcon("Clear all",
+                VaadinIcon.TRASH.create(), "18px"), event -> {
+            verticalLayoutArea.removeAll();
+            verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
+            customList.removeAll();
+            mapPrefixFileNameAndContent.clear();
+        }).addClassNames(MENU_ITEM_NO_CHECKMARK, DELETE_MENU_ITEM_NO_CHECKMARK);
+
+        itemEllipsis.getSubMenu()
+                .getItems()
+                .forEach(item -> item.getStyle().setCursor(CURSOS_POINTER));
+
+        return menuBarGridOptions;
     }
 
     private InMemoryUploadHandler buildUploadHandler() {
@@ -222,16 +253,18 @@ public class Input extends Layout implements BeforeEnterObserver {
                     });
                 })
                 .delayElements(Duration.ofMillis(50), Schedulers.boundedElastic())
+                .doOnTerminate(() -> this.executeUI(this::resetInputStream))
                 .subscribe(word -> {
-                    this.executeUI(() -> {
-                        if (!word.isEmpty()) {
-                            log.info(word);
-                            this.buildCustomSpan(word);
-                            this.resetInputStream();
-                        } else {
-                            ConfirmDialogBuilder.showInformation("Validation successfully");
-                            mapPrefixFileNameAndContent.clear();
-                        }
+                    super.getUI().ifPresent(ui -> {
+                        ui.access(() -> {
+                            if (!word.isEmpty()) {
+                                log.info(word);
+                                this.buildCustomSpan(word);
+                            } else {
+                                ConfirmDialogBuilder.showInformation("Validation successfully");
+                                this.resetInputStream();
+                            }
+                        });
                     });
                 });
     }
@@ -241,8 +274,10 @@ public class Input extends Layout implements BeforeEnterObserver {
         if (word.equals("ERROR:") || word.equals("WARNING:") || word.equals("FATAL:")) {
             this.errorSpan = this.buildErrorSpan();
         }
-        String jsCommand = "this.insertAdjacentHTML('beforeend', '<span class=\"error-word\">' + $0 + '</span> ')";
-        this.errorSpan.getElement().executeJs(jsCommand, errorSpan.getText().concat(word).concat(StringUtils.SPACE));
+//        String jsCommand = "this.insertAdjacentHTML('beforeend', '<span class=\"error-word\">' + $0 + '</span> ')";
+//        this.errorSpan.getElement().executeJs(jsCommand, errorSpan.getText().concat(word).concat(StringUtils.SPACE));
+        // Crear elemento con JavaScript para animación más fluida
+        this.errorSpan.getElement().executeJs(JS_COMMAND, word);
     }
 
     private Span buildErrorSpan() {
@@ -252,12 +287,11 @@ public class Input extends Layout implements BeforeEnterObserver {
         span.addClassNames(LumoUtility.FontSize.SMALL, TextColor.SECONDARY);
         span.getStyle().setBorderBottom(BORDER_BOTTOM_COLOR);
         span.addClickListener(event -> {
-            UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, span.getText());
+            UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, this.errorSpan.getText());
             Notification.show("Error copied!", 2000, Notification.Position.MIDDLE)
                     .addThemeVariants(NotificationVariant.LUMO_PRIMARY);
         });
         verticalLayoutArea.add(span);
-        verticalLayoutArea.scrollIntoView(ScrollIntoViewOption.Behavior.SMOOTH);
         return span;
     }
 
@@ -286,14 +320,14 @@ public class Input extends Layout implements BeforeEnterObserver {
             return;
         }
         final FileListItem fileListItem = new FileListItem(fileName, content);
-        list.add(fileListItem);
+        customList.add(fileListItem);
 
         ContextMenu contextMenu = this.buildContextMenu(fileListItem);
-        contextMenu.addItem(this.createRowItemWithVaadinIcon("Delete", VaadinIcon.TRASH), event -> {
+        contextMenu.addItem(this.createRowItemWithIcon("Delete", VaadinIcon.TRASH.create(), "15px"), event -> {
             event.getSource().getUI().ifPresent(ui -> {
                 ConfirmDialogBuilder.showConfirmInformation("Do you want to delete: " + fileName, ui)
                         .addConfirmListener(confirm -> {
-                            list.remove(fileListItem);
+                            customList.remove(fileListItem);
                             mapPrefixFileNameAndContent.remove(fileName, inputStream);
                             this.uploader.clearFileList();
                         });
@@ -307,15 +341,15 @@ public class Input extends Layout implements BeforeEnterObserver {
         return contextMenu;
     }
 
-    private HorizontalLayout createRowItemWithVaadinIcon(final String titleForSpan, VaadinIcon icon) {
+    private HorizontalLayout createRowItemWithIcon(final String titleForSpan, AbstractIcon<?> icon, String iconSizeInPx) {
         final HorizontalLayout row = new HorizontalLayout();
+        row.setId("row-with-icon");
         row.setSpacing(false);
         row.addClassNames(LumoUtility.Gap.SMALL);
         final com.vaadin.flow.component.html.Span span = new com.vaadin.flow.component.html.Span(titleForSpan);
-        var iconCustomSize = icon.create();
-        iconCustomSize.setSize("20px");
-        row.add(iconCustomSize, span);
-        row.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.START);
+        icon.setSize(iconSizeInPx);
+        row.add(icon, span);
+        row.addClassName(LumoUtility.FontSize.SMALL);
         return row;
     }
 

@@ -1,16 +1,13 @@
 package com.rubn.xsdvalidator.view.list;
 
-import com.rubn.xsdvalidator.util.Layout;
 import com.rubn.xsdvalidator.util.Color;
+import com.rubn.xsdvalidator.util.Layout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasTheme;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.dom.Style;
-import com.vaadin.flow.theme.lumo.LumoUtility.ListStyleType;
-import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
-import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 
-public class ListCustom extends com.vaadin.flow.component.html.UnorderedList implements HasTheme {
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CLICK_LIKE_HORIZONTAL_SCROLL;
+
+public class CustomList extends com.vaadin.flow.component.html.UnorderedList implements HasTheme {
 
     // Style
     private Color.Background background;
@@ -20,33 +17,13 @@ public class ListCustom extends com.vaadin.flow.component.html.UnorderedList imp
     private Layout.RowGap rowGap;
     private Layout.Overflow overflow;
 
-    public ListCustom() {
-        addClassNames(ListStyleType.NONE, Margin.Vertical.NONE, Padding.Start.NONE);
-        setDisplay(Layout.Display.GRID);
-        getStyle().setAlignItems(Style.AlignItems.START);
-        getStyle().setFlexDirection(Style.FlexDirection.ROW_REVERSE);
-        getStyle().setJustifyContent(Style.JustifyContent.START);
+    public CustomList() {
+        addClassName("custom-list-scroll");
+        getElement().executeJs(CLICK_LIKE_HORIZONTAL_SCROLL);
     }
 
     public void add(Component... components) {
         super.add(components);
-    }
-
-    /**
-     * Sets auto-sizing for grid columns with a minimum width for each column.
-     */
-    public void setAutoFill(float width, Unit unit) {
-        getStyle().set("grid-template-columns", "repeat(auto-fill, minmax(" + width + unit.toString() + ", 1fr))");
-    }
-
-    /**
-     * Removes the background color.
-     */
-    public void removeBackgroundColor() {
-        if (this.background != null) {
-            this.removeClassName(this.background.getClassName());
-        }
-        this.background = null;
     }
 
     /**
@@ -92,14 +69,6 @@ public class ListCustom extends com.vaadin.flow.component.html.UnorderedList imp
         removeRowGap();
         this.addClassNames(gap.getRowGap().getClassName());
         this.rowGap = gap.getRowGap();
-    }
-
-    /**
-     * Removes both the column (horizontal) and row (vertical) gap between components.
-     */
-    public void removeGap() {
-        removeColumnGap();
-        removeRowGap();
     }
 
     /**

@@ -3,13 +3,8 @@ package com.rubn.xsdvalidator.view.list;
 import com.rubn.xsdvalidator.util.Layout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
-import com.vaadin.flow.theme.lumo.LumoUtility.Background;
-import com.vaadin.flow.theme.lumo.LumoUtility.Display;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
-import com.vaadin.flow.theme.lumo.LumoUtility.Position;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 
 public class ListItem extends com.vaadin.flow.component.html.ListItem {
@@ -28,10 +23,6 @@ public class ListItem extends com.vaadin.flow.component.html.ListItem {
     protected Layout suffix;
 
     public ListItem() {
-        setId("list-item");
-        addClassNames(AlignItems.CENTER, Background.BASE, Display.FLEX, Gap.MEDIUM, Padding.Horizontal.MEDIUM,
-                Padding.Vertical.SMALL, Position.RELATIVE);
-
         this.prefix = new Layout();
         this.prefix.setVisible(false);
 
@@ -185,14 +176,6 @@ public class ListItem extends com.vaadin.flow.component.html.ListItem {
         removeRowGap();
         addClassNames(gap.getRowGap().getClassName());
         this.rowGap = gap.getRowGap();
-    }
-
-    /**
-     * Removes both the column (horizontal) and row (vertical) gap between components.
-     */
-    public void removeGap() {
-        removeColumnGap();
-        removeRowGap();
     }
 
     /**
