@@ -35,13 +35,7 @@ import com.vaadin.flow.server.streams.InMemoryUploadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.server.streams.UploadMetadata;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import com.vaadin.flow.theme.lumo.LumoUtility.Background;
-import com.vaadin.flow.theme.lumo.LumoUtility.Border;
-import com.vaadin.flow.theme.lumo.LumoUtility.BorderColor;
-import com.vaadin.flow.theme.lumo.LumoUtility.BorderRadius;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
-import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
-import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
@@ -63,7 +57,6 @@ import static com.rubn.xsdvalidator.util.XsdValidatorConstants.DELETE_MENU_ITEM_
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.JS_COMMAND;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.MENU_ITEM_NO_CHECKMARK;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.SCROLLBAR_CUSTOM_STYLE;
-import static com.rubn.xsdvalidator.util.XsdValidatorConstants.VAR_CUSTOM_BOX_SHADOW;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.WINDOW_COPY_TO_CLIPBOARD;
 
 /**
@@ -91,15 +84,7 @@ public class Input extends Layout implements BeforeEnterObserver {
 
     public Input(final ValidationXsdSchemaService validationXsdSchemaService) {
         this.validationXsdSchemaService = validationXsdSchemaService;
-
-        addClassNames(Background.CONTRAST_5, Border.ALL, BorderColor.CONTRAST_5, BorderRadius.LARGE,
-                Margin.Horizontal.AUTO, Margin.Top.LARGE, MaxWidth.SCREEN_MEDIUM, Padding.SMALL);
-        setBoxSizing(BoxSizing.BORDER);
-        setFlexDirection(FlexDirection.COLUMN);
-        setGap(Gap.SMALL);
-        getStyle().setBoxShadow(VAR_CUSTOM_BOX_SHADOW);
-        setMaxHeight("400px");
-
+        addClassName("input-layout");
         // Text area
         verticalLayoutArea = new VerticalLayout();
         verticalLayoutArea.addClassNames("vertical-area");
@@ -162,7 +147,6 @@ public class Input extends Layout implements BeforeEnterObserver {
         tooltip.setText("Options");
         menuBarGridOptions.setThemeName("tertiary-inline contrast");
         menuBarGridOptions.addThemeVariants(MenuBarVariant.LUMO_SMALL);
-        menuBarGridOptions.addClassName(Margin.Left.AUTO);
 
         final MenuItem itemEllipsis = menuBarGridOptions.addItem("");
         itemEllipsis.add(buttonClearAll);
