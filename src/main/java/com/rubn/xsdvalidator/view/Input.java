@@ -66,7 +66,6 @@ import static com.rubn.xsdvalidator.util.XsdValidatorConstants.WINDOW_COPY_TO_CL
 public class Input extends Layout implements BeforeEnterObserver {
 
     private final Map<String, InputStream> mapPrefixFileNameAndContent = new ConcurrentHashMap<>();
-    private final Map<Span, String> mapEachSpanAndError = new ConcurrentHashMap<>();
     private final AtomicInteger counterSpanId = new AtomicInteger(0);
     private final List<String> allErrorsList = new CopyOnWriteArrayList<>();
     private final VerticalLayout verticalLayoutArea;
@@ -94,10 +93,9 @@ public class Input extends Layout implements BeforeEnterObserver {
         final ContextMenu contextMenu = this.buildContextMenu(verticalLayoutArea);
         contextMenu.addItem(this.createRowItemWithIcon("Clean errors!", VaadinIcon.TRASH.create(), "15px"), event -> {
             verticalLayoutArea.removeAll();
+            this.counterSpanId.set(0);
             verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
         }).addClassName(CONTEXT_MENU_ITEM_NO_CHECKMARK);
-
-        this.spanWordError = this.buildErrorSpan();
 
         // attachment upload button
         attachment = new Button(VaadinIcon.UPLOAD.create());
@@ -155,7 +153,7 @@ public class Input extends Layout implements BeforeEnterObserver {
         anchorDownloadErrors.setHref(DownloadHandler.fromInputStream((event) -> {
             try {
                 String errors = this.textProcessing();
-                log.info("Errors menu item: {}", errors);
+//                log.info("Errors menu item: {}", errors);
                 byte[] byteArray = errors.getBytes(StandardCharsets.UTF_8);
                 String fileNameError = "validation-errors-" + System.currentTimeMillis() + ".txt";
                 event.getResponse().setHeader("Content-Disposition", "attachment; filename=\"" + fileNameError + "\"");
@@ -202,6 +200,7 @@ public class Input extends Layout implements BeforeEnterObserver {
             customList.removeAll();
             mapPrefixFileNameAndContent.clear();
             allErrorsList.clear();
+            this.counterSpanId.set(0);
             anchorDownloadErrors.setEnabled(false);
         }).addClassNames(MENU_ITEM_NO_CHECKMARK, DELETE_MENU_ITEM_NO_CHECKMARK);
 
@@ -257,7 +256,7 @@ public class Input extends Layout implements BeforeEnterObserver {
                     super.getUI().ifPresent(ui -> {
                         ui.access(() -> {
                             if (!word.isEmpty()) {
-                                log.info(word);
+//                                log.info(word);
                                 this.buildErrorSpanAndUpdate(word);
                                 this.anchorDownloadErrors.setEnabled(!allErrorsList.isEmpty());
                             } else {
@@ -286,9 +285,16 @@ public class Input extends Layout implements BeforeEnterObserver {
         Tooltip.forComponent(span).setText("Copy text");
         span.addClassName("parent-span");
         span.addClickListener(event -> {
-            UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, this.spanWordError.getText());
-            Notification.show("Error copied!", 2000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+            span.getId().ifPresent(id -> {
+                span.getElement().executeJs(
+                        "return Array.from(this.querySelectorAll('.error-word'))" +
+                                ".map(span => span.textContent).join('')"
+                ).then(String.class, textToCopy -> {
+                    UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, textToCopy);
+                    Notification.show("Error #"+ id + " copied!", 2000, Notification.Position.MIDDLE)
+                            .addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+                });
+            });
         });
         return span;
     }
