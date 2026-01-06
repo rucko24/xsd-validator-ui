@@ -7,6 +7,7 @@ import com.rubn.xsdvalidator.util.SvgFactory;
 import com.rubn.xsdvalidator.view.list.CustomList;
 import com.rubn.xsdvalidator.view.list.FileListItem;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.button.Button;
@@ -119,9 +120,11 @@ public class Input extends Layout implements BeforeEnterObserver {
         validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         validateButton.setAriaLabel("Validate");
         validateButton.setTooltipText("validate");
+        validateButton.setDisableOnClick(true);
         validateButton.addClickListener(event -> {
             if (!this.checkUploadedFiles()) {
                 ConfirmDialogBuilder.showWarning("Failed to start validation, check uploaded files");
+                validateButton.setEnabled(true);
                 return;
             }
             this.validateXmlInputWithXsdSchema();
@@ -308,6 +311,7 @@ public class Input extends Layout implements BeforeEnterObserver {
         mapPrefixFileNameAndContent.forEach((k, v) -> {
             try {
                 v.reset();
+                validateButton.setEnabled(true);
             } catch (IOException e) {
                 log.error("resetInputStream {}", e.getMessage());
             }
@@ -379,6 +383,11 @@ public class Input extends Layout implements BeforeEnterObserver {
             } catch (UIDetachedException ex) {
             }
         });
+    }
+
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+
     }
 
     @Override
