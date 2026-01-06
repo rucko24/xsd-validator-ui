@@ -91,7 +91,7 @@ public class Input extends Layout implements BeforeEnterObserver {
         verticalLayoutArea.addClassNames("vertical-area");
         verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
         final ContextMenu contextMenu = this.buildContextMenu(verticalLayoutArea);
-        contextMenu.addItem(this.createRowItemWithIcon("Clean errors!", VaadinIcon.TRASH.create(), "15px"), event -> {
+        contextMenu.addItem(this.createRowItemWithIcon("Clear errors!", VaadinIcon.TRASH.create(), "15px"), event -> {
             verticalLayoutArea.removeAll();
             this.counterSpanId.set(0);
             verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
@@ -193,7 +193,7 @@ public class Input extends Layout implements BeforeEnterObserver {
 
         itemEllipsis.getSubMenu().addSeparator();
 
-        itemEllipsis.getSubMenu().addItem(this.createRowItemWithIcon("Clear all",
+        itemEllipsis.getSubMenu().addItem(this.createRowItemWithIcon("Clear files and text",
                 VaadinIcon.TRASH.create(), "18px"), event -> {
             verticalLayoutArea.removeAll();
             verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
