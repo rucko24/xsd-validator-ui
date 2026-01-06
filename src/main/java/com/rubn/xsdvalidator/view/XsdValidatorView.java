@@ -3,6 +3,8 @@ package com.rubn.xsdvalidator.view;
 import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Main;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
@@ -26,8 +28,15 @@ class XsdValidatorView extends Main {
         setSizeFull();
         getStyle().setOverflow(Style.Overflow.VISIBLE);
 
-        add(new ViewToolbar("XSD Validator", ViewToolbar.group(null)));
+        add(new ViewToolbar("XSD Validator", ViewToolbar.group(this.createInfoIcon())));
         add(new Input(validationXsdSchemaService));
+    }
+
+    private Span createInfoIcon() {
+        final Span span = new Span();
+        Tooltip.forComponent(span).setText("Show info");
+        span.add(VaadinIcon.INFO_CIRCLE.create());
+        return span;
     }
 
 }
