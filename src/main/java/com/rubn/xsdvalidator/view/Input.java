@@ -286,12 +286,14 @@ public class Input extends Layout implements BeforeEnterObserver {
         span.addClassName("parent-span");
         span.addClickListener(event -> {
             span.getId().ifPresent(id -> {
-                span.getElement().executeJs(
-                        "return Array.from(this.querySelectorAll('.error-word'))" +
-                                ".map(span => span.textContent).join('')"
+                span.getElement().executeJs("""
+                        return Array.from(this.querySelectorAll('.error-word'))
+                            .map(span => span.textContent)
+                            .join('')
+                        """
                 ).then(String.class, textToCopy -> {
                     UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, textToCopy);
-                    Notification.show("Error #"+ id + " copied!", 2000, Notification.Position.MIDDLE)
+                    Notification.show("Error #" + id + " copied!", 2000, Notification.Position.MIDDLE)
                             .addThemeVariants(NotificationVariant.LUMO_PRIMARY);
                 });
             });
