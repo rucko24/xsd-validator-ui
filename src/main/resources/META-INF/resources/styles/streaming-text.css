@@ -1,13 +1,17 @@
 .parent-span {
     cursor: pointer;
+    padding: var(--lumo-space-s);
+    border-radius: var(--lumo-border-radius-l);
     border-bottom: 1px solid var(--lumo-contrast-10pct);
-    background-color red;
     color: var(--lumo-secondary-text-color);
     font-size: var(--lumo-font-size-s);
+
+    background-color: transparent;
+    transition: background-color 0.3s ease;
 }
 
 .parent-span:hover {
-    transition: background-color 0.3s ease;
+   background-color: var(--lumo-contrast-5pct);
 }
 
 .error-word {
