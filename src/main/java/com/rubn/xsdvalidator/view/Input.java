@@ -35,7 +35,6 @@ import com.vaadin.flow.server.streams.InMemoryUploadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.server.streams.UploadMetadata;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
@@ -50,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CONTEXT_MENU_ITEM_NO_CHECKMARK;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CURSOS_POINTER;
@@ -66,6 +66,8 @@ import static com.rubn.xsdvalidator.util.XsdValidatorConstants.WINDOW_COPY_TO_CL
 public class Input extends Layout implements BeforeEnterObserver {
 
     private final Map<String, InputStream> mapPrefixFileNameAndContent = new ConcurrentHashMap<>();
+    private final Map<Span, String> mapEachSpanAndError = new ConcurrentHashMap<>();
+    private final AtomicInteger counterSpanId = new AtomicInteger(0);
     private final List<String> allErrorsList = new CopyOnWriteArrayList<>();
     private final VerticalLayout verticalLayoutArea;
     private final Button attachment;
@@ -80,7 +82,7 @@ public class Input extends Layout implements BeforeEnterObserver {
     /**
      * Mutable fields
      */
-    private Span errorSpan;
+    private Span spanWordError;
 
     public Input(final ValidationXsdSchemaService validationXsdSchemaService) {
         this.validationXsdSchemaService = validationXsdSchemaService;
@@ -95,8 +97,7 @@ public class Input extends Layout implements BeforeEnterObserver {
             verticalLayoutArea.getElement().executeJs(SCROLLBAR_CUSTOM_STYLE);
         }).addClassName(CONTEXT_MENU_ITEM_NO_CHECKMARK);
 
-        //Build error span
-        this.errorSpan = this.buildErrorSpan();
+        this.spanWordError = this.buildErrorSpan();
 
         // attachment upload button
         attachment = new Button(VaadinIcon.UPLOAD.create());
@@ -129,8 +130,7 @@ public class Input extends Layout implements BeforeEnterObserver {
         });
 
         Layout actions = new Layout(this.uploader, validateButton);
-        actions.setJustifyContent(JustifyContent.BETWEEN);
-        actions.setAlignItems(AlignItems.CENTER);
+        actions.addClassName("actions");
 
         add(divHeader, verticalLayoutArea, actions);
     }
@@ -245,7 +245,7 @@ public class Input extends Layout implements BeforeEnterObserver {
         this.validationXsdSchemaService.validateXmlInputWithXsdSchema(inputXml, inputXsdSchema)
                 .doOnError(onError -> {
                     this.executeUI(() -> {
-                        log.error("Error validating: {}", xmlFileName, onError);
+//                        log.error("Error validating: {}", xmlFileName, onError);
                         ConfirmDialogBuilder.showWarning("Validation error " + onError.getLocalizedMessage());
                         this.buildErrorSpanAndUpdate(onError.getLocalizedMessage());
                         this.resetInputStream();
@@ -272,23 +272,24 @@ public class Input extends Layout implements BeforeEnterObserver {
     private void buildErrorSpanAndUpdate(String word) {
         //Obliga a crear otro span mas abajo en el VerticalLayout
         if (word.equals("ERROR:") || word.equals("WARNING:") || word.equals("FATAL:")) {
-            this.errorSpan = this.buildErrorSpan();
+            this.spanWordError = this.buildErrorSpan();
+            verticalLayoutArea.add(this.spanWordError);
             this.allErrorsList.add(StringUtils.LF);
         }
         this.allErrorsList.add(word);
-        this.errorSpan.getElement().executeJs(JS_COMMAND, word);
+        this.spanWordError.getElement().executeJs(JS_COMMAND, word);
     }
 
     private Span buildErrorSpan() {
         final Span span = new Span();
+        span.setId(String.valueOf(this.counterSpanId.incrementAndGet()));
         Tooltip.forComponent(span).setText("Copy text");
         span.addClassName("parent-span");
         span.addClickListener(event -> {
-            UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, this.errorSpan.getText());
+            UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, this.spanWordError.getText());
             Notification.show("Error copied!", 2000, Notification.Position.MIDDLE)
                     .addThemeVariants(NotificationVariant.LUMO_PRIMARY);
         });
-        verticalLayoutArea.add(span);
         return span;
     }
 
@@ -344,10 +345,14 @@ public class Input extends Layout implements BeforeEnterObserver {
     }
 
     private boolean checkUploadedFiles() {
-        long xmlCount = mapPrefixFileNameAndContent.keySet().stream()
-                .filter(k -> k.toLowerCase().endsWith(".xml")).count();
-        long xsdCount = mapPrefixFileNameAndContent.keySet().stream()
-                .filter(k -> k.toLowerCase().endsWith(".xsd")).count();
+        long xmlCount = mapPrefixFileNameAndContent.keySet()
+                .stream()
+                .filter(k -> k.toLowerCase().endsWith(".xml"))
+                .count();
+        long xsdCount = mapPrefixFileNameAndContent.keySet()
+                .stream()
+                .filter(k -> k.toLowerCase().endsWith(".xsd"))
+                .count();
         return xmlCount >= 1 && xsdCount >= 1;
     }
 

@@ -40,12 +40,8 @@ public class XsdValidatorConstants {
                     span.className = 'error-word fade-in';
                     span.textContent = $0 + ' ';
                     this.appendChild(span);
-                
-                    // Trigger reflow para reiniciar animación
                     void span.offsetWidth;
                     span.classList.add('visible');
-                
-                    // Scroll suave
                     span.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 """;
     public static final String CLICK_LIKE_HORIZONTAL_SCROLL = """
@@ -53,29 +49,25 @@ public class XsdValidatorConstants {
             let isDown = false;
             let startX;
             let scrollLeft;
-
             slider.addEventListener('mousedown', (e) => {
               isDown = true;
-              slider.classList.add('grabbing'); // Cambia el cursor
+              slider.classList.add('grabbing');
               startX = e.pageX - slider.offsetLeft;
               scrollLeft = slider.scrollLeft;
             });
-
             slider.addEventListener('mouseleave', () => {
               isDown = false;
               slider.classList.remove('grabbing');
             });
-
             slider.addEventListener('mouseup', () => {
               isDown = false;
               slider.classList.remove('grabbing');
             });
-
             slider.addEventListener('mousemove', (e) => {
               if (!isDown) return;
-              e.preventDefault(); // Evita seleccionar texto
+              e.preventDefault();
               const x = e.pageX - slider.offsetLeft;
-              const walk = (x - startX) * 2; // Ajusta la velocidad del scroll (* 2 es buena velocidad)
+              const walk = (x - startX) * 2;
               slider.scrollLeft = scrollLeft - walk;
             });
             """;

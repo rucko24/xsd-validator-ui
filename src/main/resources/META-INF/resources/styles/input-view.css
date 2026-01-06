@@ -46,6 +46,11 @@
     text-decoration: none !important;
 }
 
+.actions {
+    justify-content: justify-between;
+    align-items: center;
+}
+
 vaadin-context-menu-item.context-menu-item-no-checkmark {
   padding-left: var(--lumo-space-s);
   justify-content: flex-start;
