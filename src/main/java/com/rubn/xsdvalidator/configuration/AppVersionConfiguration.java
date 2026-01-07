@@ -1,28 +1,25 @@
 package com.rubn.xsdvalidator.configuration;
 
 import com.rubn.xsdvalidator.records.AppVersionRecord;
-import org.apache.maven.model.v4.MavenStaxReader;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.xml.stream.XMLStreamException;
-import java.io.FileReader;
-import java.io.IOException;
 
 /**
  * @author rubn
  */
+@Getter
+@Setter
 @Configuration
+@ConfigurationProperties(prefix = "app")
 public class AppVersionConfiguration {
 
-    @Bean
-    public MavenStaxReader mavenXpp3Reader() {
-        return new MavenStaxReader();
-    }
+    private String appVersion;
 
     @Bean
-    public AppVersionRecord appVersion(final MavenStaxReader mavenStaxReader) throws IOException, XMLStreamException {
-        String appVersion = mavenStaxReader.read(new FileReader("pom.xml")).getVersion();
+    public AppVersionRecord appVersion() {
         return new AppVersionRecord(appVersion);
     }
 

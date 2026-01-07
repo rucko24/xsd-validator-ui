@@ -12,6 +12,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.COPY_TO_CLIPBOARD;
 
@@ -35,6 +36,7 @@ class XsdValidatorView extends Main {
     private Span createInfoIcon() {
         final Span span = new Span();
         Tooltip.forComponent(span).setText("Show info");
+        span.addClassName(LumoUtility.TextColor.SECONDARY);
         span.add(VaadinIcon.INFO_CIRCLE.create());
         return span;
     }

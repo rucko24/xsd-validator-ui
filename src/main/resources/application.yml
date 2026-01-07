@@ -26,3 +26,6 @@ spring:
   servlet:
     multipart.max-file-size: 50MB
     multipart.max-request-size: 50MB
+
+app:
+  app-version: 1.0.18-SNAPSHOT
