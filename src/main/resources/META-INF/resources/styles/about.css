@@ -1,5 +1,7 @@
-vaadin-dialog-overlay.about-dialog::part(backdrop) {
+vaadin-dialog.about-dialog::part(backdrop) {
     backdrop-filter: blur(1px);
+    will-change: backdrop-filter;
+    contain: layout style paint;
 }
 
 vaadin-dialog.about-dialog::part(header) {
