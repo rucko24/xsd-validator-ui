@@ -15,7 +15,7 @@ public class AboutDialog extends Dialog {
         final Button closeButton = new Button(new Icon("lumo", "cross"));
         closeButton.setTooltipText("Close");
         closeButton.addClassName(LumoUtility.Margin.Left.AUTO);
-        closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_SMALL);
+        closeButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         closeButton.addClickListener(e -> close());
         super.getHeader().add(closeButton);
 
