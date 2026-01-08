@@ -263,7 +263,7 @@ public class Input extends Layout implements BeforeEnterObserver {
                                 this.buildErrorSpanAndUpdate(word);
                                 this.anchorDownloadErrors.setEnabled(!allErrorsList.isEmpty());
                             } else {
-                                ConfirmDialogBuilder.showInformation("Validation successfully");
+                                ConfirmDialogBuilder.showInformation("Validation successful");
                                 this.resetInputStream();
                             }
                         });

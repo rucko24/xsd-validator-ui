@@ -36,8 +36,11 @@ class XsdValidatorView extends Main {
     private Span createInfoIcon() {
         final Span span = new Span();
         Tooltip.forComponent(span).setText("Show info");
-        span.addClassName(LumoUtility.TextColor.SECONDARY);
+        span.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.AlignSelf.CENTER, LumoUtility.Margin.Right.SMALL);
         span.add(VaadinIcon.INFO_CIRCLE.create());
+        span.addClickListener(event -> {
+            new AboutDialog().open();
+        });
         return span;
     }
 

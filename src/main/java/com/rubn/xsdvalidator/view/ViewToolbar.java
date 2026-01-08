@@ -15,7 +15,7 @@ public final class ViewToolbar extends Composite<HorizontalLayout> {
 
     public ViewToolbar(@Nullable String viewTitle, Component... components) {
         var layout = getContent();
-        layout.setPadding(true);
+        layout.setPadding(false);
         layout.setWrap(true);
         layout.setWidthFull();
         layout.addClassName(LumoUtility.Border.BOTTOM);
