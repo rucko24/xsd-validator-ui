@@ -1,0 +1,9 @@
+vaadin-dialog-overlay.about-dialog::part(backdrop) {
+    backdrop-filter: blur(1px);
+}
+
+vaadin-dialog.about-dialog::part(header) {
+    margin-right: var(--lumo-space-s);
+    margin-top: var(--lumo-space-s);
+    padding: 0;
+}

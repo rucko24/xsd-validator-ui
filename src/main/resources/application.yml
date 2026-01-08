@@ -20,14 +20,14 @@ vaadin:
 # Instead, use Flyway or another controlled way of managing your database schema.
 # See https://vaadin.com/docs/latest/building-apps/forms-data/add-flyway for instructions.
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
+  #jpa:
+  #  hibernate:
+  #    ddl-auto: update
   servlet:
     multipart.max-file-size: 50MB
     multipart.max-request-size: 50MB
 
 app:
-  app-version: 1.0.19-SNAPSHOT
+  app-version: 1.0.20-SNAPSHOT
   browser:
     auto-open: true
