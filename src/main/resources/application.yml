@@ -31,6 +31,6 @@ spring:
       enabled: true
 
 app:
-  app-version: 1.0.44-SNAPSHOT
+  app-version: 1.0.44_1-SNAPSHOT
   browser:
     auto-open: false

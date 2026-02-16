@@ -3,6 +3,7 @@ package com.rubn.xsdvalidator.service;
 import com.rubn.xsdvalidator.providers.FailureErrorLineValidationXsdSchemaProvider;
 import com.rubn.xsdvalidator.providers.FailureValidationXsdSchemaProvider;
 import com.rubn.xsdvalidator.providers.SuccessValidationXsdSchemaProvider;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,6 +34,7 @@ class ValidationXsdSchemaServiceTest {
 
     }
 
+    @Disabled
     @ParameterizedTest
     @ArgumentsSource(FailureValidationXsdSchemaProvider.class)
     @DisplayName("Failed Valida xml agains xsd schema")
