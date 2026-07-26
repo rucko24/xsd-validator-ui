@@ -14,10 +14,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @StyleSheet(Lumo.STYLESHEET)
 @StyleSheet(Lumo.UTILITY_STYLESHEET)
 @StyleSheet("styles.css")
-@ColorScheme(ColorScheme.Value.LIGHT_DARK)
+@ColorScheme(ColorScheme.Value.LIGHT)
 public class Application implements AppShellConfigurator {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 

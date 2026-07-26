@@ -13,7 +13,6 @@ import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.checkbox.CheckboxVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.AbstractIcon;
@@ -104,8 +103,6 @@ public class FileListItem extends ListItem {
                 .withPosition(Tooltip.TooltipPosition.TOP);
 
         super.setPrimary(spanPrefixName, this.buttonClose);
-
-        checkbox.addThemeVariants(CheckboxVariant.LUMO_HELPER_ABOVE_FIELD);
 
         String content = SIZE + XsdValidatorFileUtils.formatSize(contentLength);
         Span sizeSpan = new Span();

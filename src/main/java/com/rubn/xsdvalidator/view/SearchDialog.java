@@ -3,9 +3,9 @@ package com.rubn.xsdvalidator.view;
 import com.rubn.xsdvalidator.util.SvgFactory;
 import com.rubn.xsdvalidator.util.XsdValidatorConstants;
 import com.rubn.xsdvalidator.util.XsdValidatorFileUtils;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.ModalityMode;
+import com.vaadin.flow.component.badge.Badge;
+import com.vaadin.flow.component.badge.BadgeVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Hr;
@@ -20,6 +20,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.dom.DomEventListener;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.extern.log4j.Log4j2;
 import org.jspecify.annotations.NonNull;
@@ -35,7 +37,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rubn.xsdvalidator.util.XsdValidatorConstants.BADGE_PILL_SMALL;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CURSOR_POINTER;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.SCROLLBAR_CUSTOM_STYLE_ITEMS;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.XML;
@@ -49,7 +50,6 @@ import static com.rubn.xsdvalidator.util.XsdValidatorConstants.XSD_ICON;
 @Log4j2
 public class SearchDialog extends Dialog {
 
-    public static final String BADGE_PILL = "badge pill";
     public static final String THEME_INACTIVE = "contrast";
     public static final String HEIGHT = "300px";
 
@@ -58,9 +58,10 @@ public class SearchDialog extends Dialog {
     private final Set<String> currentSelection = new ConcurrentSkipListSet<>();
     private final TextField searchField;
 
-    private final Span totalSpan = new Span();
-    private final Span xsdSpan = new Span();
-    private final Span xmlSpan = new Span();
+    //FIXME Badges
+    private final Badge totalBadge = new Badge();
+    private final Badge xsdBadge = new Badge();
+    private final Badge xmlBadge = new Badge();
 
     private List<String> allXsdXmlFiles;
     private List<String> currentVisibleItems;
@@ -121,11 +122,11 @@ public class SearchDialog extends Dialog {
             spanParamFileName.addClassName(LumoUtility.TextColor.SECONDARY);
             spanParamFileName.getStyle().setCursor(CURSOR_POINTER);
 
-            Span spanSize = new Span(formattedSize);
-            spanSize.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontSize.XXSMALL);
-            spanSize.getElement().getThemeList().add(BADGE_PILL_SMALL);
+            Badge badgeSize = new Badge(formattedSize);
+            badgeSize.addClassNames(LumoUtility.TextColor.SECONDARY);
+            badgeSize.addThemeVariants(BadgeVariant.SMALL);
 
-            final VerticalLayout verticalLayout = new VerticalLayout(spanParamFileName, spanSize);
+            final VerticalLayout verticalLayout = new VerticalLayout(spanParamFileName, badgeSize);
             verticalLayout.setPadding(false);
             verticalLayout.setSpacing(false);
 
@@ -166,36 +167,37 @@ public class SearchDialog extends Dialog {
         HorizontalLayout filtersBadges = new HorizontalLayout();
         filtersBadges.getStyle().setPadding("var(--lumo-space-xs)");
         filtersBadges.setSpacing("var(--lumo-space-s)");
-        com.vaadin.flow.component.html.Span spanXml = new com.vaadin.flow.component.html.Span(XML);
-        com.vaadin.flow.component.html.Span spanXsd = new com.vaadin.flow.component.html.Span(XSD);
-        com.vaadin.flow.component.html.Span spanSize = new com.vaadin.flow.component.html.Span("Size");
-        Stream.of(spanXml, spanXsd, spanSize).forEach(this::configureBadgeSpan);
 
-        ComponentEventListener<ClickEvent<com.vaadin.flow.component.html.Span>> listener = event -> {
-            com.vaadin.flow.component.html.Span clicked = event.getSource();
-            boolean wasActive = !clicked.getElement().getThemeList().contains(THEME_INACTIVE);
-            Stream.of(spanXml, spanXsd, spanSize).forEach(this::makeInactive);
+        Badge badgeXml = new Badge(XML);
+        Badge badgeXsd = new Badge(XSD);
+        Badge badgeSize = new Badge("Size");
 
-            if (wasActive) {
-                this.filterList(this.searchField.getValue(), false);
-            } else {
-                clicked.getElement().getThemeList().remove(THEME_INACTIVE);
-                String value = clicked.getText();
-                boolean filterBySize = Objects.equals(value, spanSize.getText());
-                this.filterList(value, filterBySize);
-            }
-        };
+        Stream.of(badgeXml, badgeXsd, badgeSize).forEach(badge -> {
+            this.configureBadge(badge);
+            this.addBadgeClickListener(badge, event -> {
+                Element clicked = event.getSource();
+                boolean wasActive = !clicked.getThemeList().contains(THEME_INACTIVE);
+                Stream.of(badgeXml, badgeXsd, badgeSize).forEach(this::makeInactive);
 
-        Stream.of(spanXml, spanXsd, spanSize).forEach(span -> span.addClickListener(listener));
-        filtersBadges.add(spanXml, spanXsd, spanSize);
+                if (wasActive) {
+                    this.filterList(this.searchField.getValue(), false);
+                } else {
+                    clicked.getThemeList().remove(THEME_INACTIVE);
+                    String value = clicked.getText();
+                    boolean filterBySize = Objects.equals(value, badgeSize.getText());
+                    this.filterList(value, filterBySize);
+                }
+            });
+        });
+
+        filtersBadges.add(badgeXml, badgeXsd, badgeSize);
         final Hr hrLine = buildHrSeparator();
 
         final HorizontalLayout rowFooter = new HorizontalLayout();
         rowFooter.getStyle().setPadding("var(--lumo-space-xs)");
         rowFooter.setSpacing("var(--lumo-space-s)");
-
         this.updateCounters();
-        rowFooter.add(totalSpan, xsdSpan, xmlSpan);
+        rowFooter.add(totalBadge, xsdBadge, xmlBadge);
 
         final Hr hrLineFooter = buildHrSeparator();
 
@@ -321,18 +323,9 @@ public class SearchDialog extends Dialog {
                 .filter(name -> name.toLowerCase().endsWith(XML))
                 .count();
 
-        configureSpan(totalSpan, "Total: " + allXsdXmlFiles.size());
-        configureSpan(xsdSpan, "xsd: " + countXsd);
-        configureSpan(xmlSpan, "xml: " + countXml);
-    }
-
-    private void configureSpan(Span span, String text) {
-        span.setText(text);
-        span.getElement().getThemeList().clear(); // Limpiar para evitar duplicados
-        span.getElement().getThemeList().add(BADGE_PILL + " small");
-        span.addClassNames(LumoUtility.TextColor.SECONDARY);
-        this.removeUserSelectInSpan(span);
-        span.getStyle().setBoxShadow(XsdValidatorConstants.VAR_CUSTOM_BOX_SHADOW);
+        configureFooterForBadges(totalBadge, "Total: " + allXsdXmlFiles.size());
+        configureFooterForBadges(xsdBadge, "xsd: " + countXsd);
+        configureFooterForBadges(xmlBadge, "xml: " + countXml);
     }
 
     private @NonNull Hr buildHrSeparator() {
@@ -341,21 +334,38 @@ public class SearchDialog extends Dialog {
         return hrLine;
     }
 
-    private void configureBadgeSpan(com.vaadin.flow.component.html.Span span) {
-        span.getElement().getThemeList().add(BADGE_PILL + " " + THEME_INACTIVE);
-        span.getStyle().setCursor(CURSOR_POINTER);
-        this.removeUserSelectInSpan(span);
-        span.getStyle().setBoxShadow(XsdValidatorConstants.VAR_CUSTOM_BOX_SHADOW);
+    private void configureBadge(Badge badge) {
+        badge.addThemeVariants(BadgeVariant.CONTRAST);
+        badge.getStyle().setCursor(CURSOR_POINTER);
+        this.removeUserSelectInBadge(badge);
+        badge.getStyle().setBoxShadow(XsdValidatorConstants.VAR_CUSTOM_BOX_SHADOW);
+
     }
 
-    private void removeUserSelectInSpan(com.vaadin.flow.component.html.Span span) {
-        span.getStyle().set("user-select", "none");
-        span.getStyle().set("-webkit-user-select", "none");
-        span.getStyle().set("-moz-user-select", "none");
+    private void configureFooterForBadges(Badge badge, String text) {
+       badge.setText(text);
+       badge.getElement().getThemeList().clear(); // Limpiar para evitar duplicados
+       badge.addThemeVariants(BadgeVariant.SMALL);
+       badge.addClassNames(LumoUtility.TextColor.SECONDARY);
+       this.removeUserSelectInBadge(badge);
+       badge.getStyle().setBoxShadow(XsdValidatorConstants.VAR_CUSTOM_BOX_SHADOW);
     }
 
-    private void makeInactive(com.vaadin.flow.component.html.Span span) {
-        span.getElement().getThemeList().add(THEME_INACTIVE);
+    private void removeUserSelectInBadge(Badge badge) {
+        badge.getStyle().set("user-select", "none");
+        badge.getStyle().set("-webkit-user-select", "none");
+        badge.getStyle().set("-moz-user-select", "none");
+    }
+
+    private void addBadgeClickListener(Badge badge, DomEventListener listener) {
+        badge.getStyle().setCursor(CURSOR_POINTER);
+        badge.setRole("button");
+        badge.getElement().setAttribute("tabindex", "0");
+        badge.getElement().addEventListener("click", listener);
+    }
+
+    private void makeInactive(Badge badge) {
+        badge.getElement().getThemeList().add(THEME_INACTIVE);
     }
 
 }

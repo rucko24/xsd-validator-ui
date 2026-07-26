@@ -4,6 +4,8 @@ import com.rubn.xsdvalidator.records.AppVersionRecord;
 import com.rubn.xsdvalidator.util.XsdValidatorConstants;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.badge.Badge;
+import com.vaadin.flow.component.badge.BadgeVariant;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -39,8 +41,8 @@ public final class MainLayout extends AppLayout {
             getUI().ifPresent(ui -> ui.getPage().open("https://github.com/rucko24/xsd-validator-ui"));
         });
 
-        final Span spanName = new Span(appVersionRecord.version());
-        spanName.getElement().getThemeList().add("badge pill contrast");
+        final Badge spanName = new Badge(appVersionRecord.version());
+        spanName.addThemeVariants(BadgeVariant.CONTRAST);
         spanName.getStyle().setBoxShadow(XsdValidatorConstants.VAR_CUSTOM_BOX_SHADOW);
         spanName.addClassNames(LumoUtility.FontWeight.SEMIBOLD, LumoUtility.FontSize.XXSMALL,
                 LumoUtility.TextColor.SECONDARY);
