@@ -1,5 +1,5 @@
-import { ReactAdapterElement, RenderHooks } from 'Frontend/generated/flow/ReactAdapter';
-import React, { ReactElement, useState, useEffect, useRef } from 'react';
+import {ReactAdapterElement, RenderHooks} from 'Frontend/generated/flow/ReactAdapter';
+import React, {ReactElement, useEffect, useRef, useState} from 'react';
 import Editor from '@monaco-editor/react';
 
 function MyReactEditor({ content, onContentChange, themeName, wrapEnabled,

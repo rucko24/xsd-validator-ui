@@ -13,10 +13,10 @@ import com.rubn.xsdvalidator.view.list.FileListItem;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.DetachEvent;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.clipboard.Clipboard;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.html.Anchor;
@@ -75,7 +75,6 @@ import static com.rubn.xsdvalidator.util.XsdValidatorConstants.JS_COMMAND;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.MENU_ITEM_NO_CHECKMARK;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.RETURN_TEXT_ERROR;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.SCROLLBAR_CUSTOM_STYLE;
-import static com.rubn.xsdvalidator.util.XsdValidatorConstants.WINDOW_COPY_TO_CLIPBOARD;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.XML;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.XSD;
 
@@ -277,7 +276,7 @@ public class Input extends Layout implements BeforeEnterObserver {
         MenuItem itemDelete = itemEllipsis.getSubMenu().addItem(row, event -> {
             if (!this.allErrorsList.isEmpty()) {
                 String errors = this.textProcessing();
-                UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, errors);
+                Clipboard.onClick(svgIcon).writeText(errors);
                 Notification.show("Copied!", 2000, Notification.Position.MIDDLE)
                         .addThemeVariants(NotificationVariant.LUMO_PRIMARY);
             }
@@ -429,7 +428,7 @@ public class Input extends Layout implements BeforeEnterObserver {
             span.getId().ifPresent(id -> {
                 span.getElement().executeJs(RETURN_TEXT_ERROR
                 ).then(String.class, errorText -> {
-                    UI.getCurrent().getPage().executeJs(WINDOW_COPY_TO_CLIPBOARD, errorText);
+                    Clipboard.onClick(span).writeText(errorText);
                     Notification.show("Error #" + id + " copied!", 2000, Notification.Position.MIDDLE)
                             .addThemeVariants(NotificationVariant.LUMO_PRIMARY);
                 });

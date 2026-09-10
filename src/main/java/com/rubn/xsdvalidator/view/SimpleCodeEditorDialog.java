@@ -5,10 +5,10 @@ import com.rubn.xsdvalidator.util.ConfirmDialogBuilder;
 import com.rubn.xsdvalidator.util.SvgFactory;
 import com.rubn.xsdvalidator.util.XsdValidatorConstants;
 import com.rubn.xsdvalidator.util.XsdValidatorFileUtils;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.UIDetachedException;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.clipboard.Clipboard;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.SvgIcon;
@@ -33,7 +33,6 @@ import java.util.Map;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CURSOR_POINTER;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.LIGHT;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.VS_DARK;
-import static com.rubn.xsdvalidator.util.XsdValidatorConstants.WINDOW_COPY_TO_CLIPBOARD;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.XML;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.XSD;
 import static com.rubn.xsdvalidator.view.list.FileListItem.SIZE;
@@ -79,7 +78,7 @@ public class SimpleCodeEditorDialog extends Dialog {
         final Button copyButton = new Button(copyButtonIcon);
         copyButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
         copyButton.addClickListener(event -> {
-            UI.getCurrent().getElement().executeJs(WINDOW_COPY_TO_CLIPBOARD, fileName);
+            Clipboard.onClick(copyButton).writeText(fileName);
             Notification.show("Copied " + fileName, 2500, Notification.Position.MIDDLE)
                     .addThemeVariants(NotificationVariant.LUMO_PRIMARY);
             copyButton.setIcon(VaadinIcon.CHECK.create());
