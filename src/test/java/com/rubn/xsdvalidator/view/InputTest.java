@@ -1,13 +1,11 @@
 package com.rubn.xsdvalidator.view;
 
-import com.github.mvysny.kaributesting.v10.MockVaadin;
 import com.rubn.xsdvalidator.records.DecompressedFile;
 import com.rubn.xsdvalidator.service.DecompressionService;
 import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
 import com.rubn.xsdvalidator.view.list.CustomList;
 import com.rubn.xsdvalidator.view.list.FileListItem;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
+import com.vaadin.browserless.BrowserlessUIContext;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,9 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.mvysny.kaributesting.v10.LocatorJ._click;
-import static com.github.mvysny.kaributesting.v10.LocatorJ._find;
-import static com.github.mvysny.kaributesting.v10.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,22 +44,26 @@ class InputTest {
     @Mock
     private ProgressBar progressBar;
 
+    /**
+     * A single browser window showing only the component under test, no routes or Spring context needed.
+     */
+    private BrowserlessUIContext window;
+
     @BeforeEach
     public void setup() {
-        MockVaadin.setup();
-        UI.getCurrent().add(inputView);
+        window = BrowserlessUIContext.forComponent(inputView);
     }
 
     @AfterEach
     public void tearDown() {
-        MockVaadin.tearDown();
+        window.close();
     }
 
     @Test
     public void smokeTest_componentsArePresent() {
-        _get(Button.class, spec -> spec.withText("Validate"));
+        window.findButton().withText("Validate").component();
 
-        CustomList list = _get(CustomList.class);
+        CustomList list = window.find(CustomList.class).single();
         assertEquals(0, list.getChildren().count());
     }
 
@@ -77,7 +76,7 @@ class InputTest {
         injectFile("main.xsd", "<schema>...</schema>".getBytes(StandardCharsets.UTF_8));
         injectFile("data.xml", "<data>...</data>".getBytes(StandardCharsets.UTF_8));
 
-        List<FileListItem> items = _find(FileListItem.class);
+        List<FileListItem> items = window.find(FileListItem.class).all();
         assertEquals(2, items.size());
 
         FileListItem xsdItem = items.stream().filter(i -> i.getFileName().endsWith(".xsd")).findFirst().get();
@@ -86,8 +85,7 @@ class InputTest {
         xsdItem.setSelected(true);
         xmlItem.setSelected(true);
 
-        Button validateBtn = _get(Button.class, spec -> spec.withText("Validate"));
-        _click(validateBtn);
+        window.findButton().withText("Validate").click();
 
         verify(validationService, times(1)).validateXmlInputWithXsdSchema(any(), any(), any());
 
@@ -113,7 +111,7 @@ class InputTest {
         injectFile("main.xsd", xsdContent.getBytes(StandardCharsets.UTF_8));
         injectFile("data.xml", "DUMMY XML CONTENT".getBytes(StandardCharsets.UTF_8));
 
-        CustomList list = _get(CustomList.class);
+        CustomList list = window.find(CustomList.class).single();
         assertEquals(2, list.getChildren().count(), "Deben haber 2 items visuales antes de limpiar");
 
         inputView.clearAllData();
