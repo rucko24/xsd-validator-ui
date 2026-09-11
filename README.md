@@ -1,6 +1,12 @@
 # Xsd-validator-UI
 
-<img width="1842" height="1031" alt="image" src="https://github.com/user-attachments/assets/84de9bbf-92e6-4591-a10b-d748b58ce8bd" />
+<img width="1859" height="983" alt="image" src="https://github.com/user-attachments/assets/8513b057-c402-4dfe-a693-55ff2e33d5a9" />
+
+## Analyze a file using the Monaco Editor
+
+<img width="972" height="144" alt="image" src="https://github.com/user-attachments/assets/398762b5-9d87-4c8d-8088-998b0ecd9c7d" />
+
+<img width="1859" height="937" alt="image" src="https://github.com/user-attachments/assets/9c98887d-f3e7-4a1e-b602-edb82d1f97ff" />
 
 ## Starting in Development Mode
 
