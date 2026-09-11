@@ -132,12 +132,11 @@
             <version>1.119</version>
         </dependency>
 
-        <!-- Source: https://mvnrepository.com/artifact/com.github.mvysny.kaributesting/karibu-testing-v24 -->
+        <!-- Vaadin Browserless Test (JUnit 6), https://vaadin.com/docs/latest/testing/browserless -->
         <dependency>
-            <groupId>com.github.mvysny.kaributesting</groupId>
-            <artifactId>karibu-testing-v24</artifactId>
-            <version>2.6.2</version>
-            <scope>compile</scope>
+            <groupId>com.vaadin</groupId>
+            <artifactId>browserless-test-junit6</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
