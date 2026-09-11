@@ -59,7 +59,6 @@ public class SimpleCodeEditorDialog extends Dialog {
         this.mapPrefixFileNameAndContent = mapPrefixFileNameAndContent;
         this.searchPopover = searchPopover;
         this.sizeSpan = sizeSpan;
-
         this.buildContentDialog();
     }
 

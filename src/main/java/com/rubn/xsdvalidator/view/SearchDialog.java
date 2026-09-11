@@ -58,7 +58,6 @@ public class SearchDialog extends Dialog {
     private final Set<String> currentSelection = new ConcurrentSkipListSet<>();
     private final TextField searchField;
 
-    //FIXME Badges
     private final Badge totalBadge = new Badge();
     private final Badge xsdBadge = new Badge();
     private final Badge xmlBadge = new Badge();
@@ -250,7 +249,7 @@ public class SearchDialog extends Dialog {
     }
 
     /**
-     * Sirve para actualizar los span del footer, cuando se borran o editan los {@link com.rubn.xsdvalidator.view.list.FileListItem}
+     * Sirve para actualizar los badges del footer, cuando se borran o editan los {@link com.rubn.xsdvalidator.view.list.FileListItem}
      *
      * @param newItems
      */

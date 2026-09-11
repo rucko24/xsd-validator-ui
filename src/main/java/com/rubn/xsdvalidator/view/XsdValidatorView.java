@@ -3,9 +3,11 @@ package com.rubn.xsdvalidator.view;
 import com.rubn.xsdvalidator.service.DecompressionService;
 import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
 import com.rubn.xsdvalidator.util.XsdValidatorConstants;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.Shortcuts;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Main;
@@ -13,18 +15,22 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.page.ColorScheme;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.dom.Style;
+import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
+import com.vaadin.flow.theme.lumo.Lumo;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.vaadin.firitin.components.checkbox.ToggleButton;
 
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CURSOR_POINTER;
 
@@ -45,12 +51,34 @@ class XsdValidatorView extends Main {
         getStyle().setOverflow(Style.Overflow.VISIBLE);
 
         final Input input = new Input(validationXsdSchemaService, decompressionService, progressBar);
-        add(new ViewToolbar(StringUtils.EMPTY, this.buildSearchButton(input), this.createInfoIcon()));
+        add(new ViewToolbar(StringUtils.EMPTY, this.buildSearchButton(input), buildCorner()));
         add(input, progressBar);
 
     }
 
-    private Span createInfoIcon() {
+    private HorizontalLayout buildCorner() {
+        final HorizontalLayout horizontalLayout = new HorizontalLayout(buildToggleButtonTheme(), buildInfoIcon());
+        horizontalLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        return horizontalLayout;
+    }
+
+    private ToggleButton buildToggleButtonTheme() {
+        ToggleButton toggleButton = new ToggleButton();
+        toggleButton.setTooltipText("Change to dark theme");
+        toggleButton.addClickListener(event -> {
+            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+            if (themeList.contains(Lumo.DARK)) {
+                themeList.remove(Lumo.DARK);
+                toggleButton.setTooltipText("Change to dark theme");
+            } else {
+                themeList.add(Lumo.DARK);
+                toggleButton.setTooltipText("Change to light theme");
+            }
+        });
+        return toggleButton;
+    }
+
+    private Span buildInfoIcon() {
         final Span span = new Span();
         span.getStyle().setCursor(CURSOR_POINTER);
         Tooltip.forComponent(span).setText("Show info");
