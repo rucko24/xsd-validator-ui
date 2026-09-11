@@ -3,19 +3,18 @@ package com.rubn.xsdvalidator.view;
 import com.rubn.xsdvalidator.service.DecompressionService;
 import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
 import com.rubn.xsdvalidator.util.XsdValidatorConstants;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.Shortcuts;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.page.ColorScheme;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.dom.Style;
@@ -32,6 +31,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.vaadin.firitin.components.checkbox.ToggleButton;
 
+import static com.rubn.xsdvalidator.util.XsdValidatorConstants.COPY_TO_CLIPBOARD;
 import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CURSOR_POINTER;
 
 @Log4j2
@@ -41,6 +41,7 @@ import static com.rubn.xsdvalidator.util.XsdValidatorConstants.CURSOR_POINTER;
 @RouteAlias("xsd-validator")
 @PageTitle("xsd-validator")
 @Menu(order = 1, icon = "vaadin:clipboard-check", title = "XSD Validator")
+@JsModule(COPY_TO_CLIPBOARD)
 class XsdValidatorView extends Main {
 
     private final ProgressBar progressBar = new ProgressBar();
