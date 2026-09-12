@@ -4,6 +4,13 @@
 
 ## Analyze a file using the Monaco Editor
 
+sample files to upload.
+
+- [Folder validation-failure files](https://github.com/rucko24/xsd-validator-ui/tree/main/src/test/resources/documents/validation-failure)
+- [Folder validation-successfully files](https://github.com/rucko24/xsd-validator-ui/tree/main/src/test/resources/documents/validation-successfully)
+
+- Select these two files and validate them. `order-instance.xml` and `main-order.xsd`
+
 <img width="972" height="144" alt="image" src="https://github.com/user-attachments/assets/398762b5-9d87-4c8d-8088-998b0ecd9c7d" />
 
 <img width="1859" height="937" alt="image" src="https://github.com/user-attachments/assets/9c98887d-f3e7-4a1e-b602-edb82d1f97ff" />
