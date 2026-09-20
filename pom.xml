@@ -139,6 +139,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.flowingcode.addons</groupId>
+            <artifactId>xterm-console</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
     </dependencies>
     
     <build>

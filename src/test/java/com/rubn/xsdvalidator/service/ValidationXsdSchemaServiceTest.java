@@ -3,6 +3,7 @@ package com.rubn.xsdvalidator.service;
 import com.rubn.xsdvalidator.providers.FailureErrorLineValidationXsdSchemaProvider;
 import com.rubn.xsdvalidator.providers.FailureValidationXsdSchemaProvider;
 import com.rubn.xsdvalidator.providers.SuccessValidationXsdSchemaProvider;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import java.util.Locale;
 import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,6 +22,11 @@ class ValidationXsdSchemaServiceTest {
 
     @InjectMocks
     private ValidationXsdSchemaService validationXsdSchemaService;
+
+    @BeforeAll
+    static void setLocale() {
+        Locale.setDefault(Locale.ENGLISH);
+    }
 
     @ParameterizedTest
     @ArgumentsSource(SuccessValidationXsdSchemaProvider.class)
