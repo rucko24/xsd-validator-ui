@@ -21,9 +21,10 @@ public enum SupportFilesEnum {
 
     public static SupportFilesEnum fromExtension(String filenameOrExtension) {
         if (StringUtils.isBlank(filenameOrExtension)) return UNKNOWN;
+        String lowerInput = filenameOrExtension.toLowerCase();
         return Arrays.stream(SupportFilesEnum.values())
                 .filter(type -> type != UNKNOWN)
-                .filter(type -> type.extension.endsWith(filenameOrExtension))
+                .filter(type -> lowerInput.endsWith(type.extension) || lowerInput.equals(type.extension.replace(".", "")))
                 .findFirst()
                 .orElse(UNKNOWN);
     }

@@ -1,6 +1,7 @@
 package com.rubn.xsdvalidator.view;
 
 import com.rubn.xsdvalidator.records.DecompressedFile;
+import com.rubn.xsdvalidator.records.ErrorEventRecord;
 import com.rubn.xsdvalidator.service.DecompressionService;
 import com.rubn.xsdvalidator.service.ValidationXsdSchemaService;
 import com.rubn.xsdvalidator.util.ConfirmDialogBuilder;
@@ -44,6 +45,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.MediaType;
 import org.vaadin.firitin.components.upload.UploadFileHandler;
 import reactor.core.Disposable;
@@ -326,19 +328,22 @@ public class Input extends Layout implements BeforeEnterObserver {
             if (XsdValidatorFileUtils.isNotSupportedExtension(metadata.fileName())) {
                 // Another improvement place for UploadFileHandler here, would be great to
                 // have reference for component/ui in handler...
+                log.warn("File ignored during upload: {}", metadata.fileName());
                 accessUI(() -> {
                     ConfirmDialogBuilder.showWarning("File not supported! " + metadata.fileName());
-                    uploadFileHandler.clearFiles(); // manually clear files after error as UFH doesn't seem to do it
+                    //uploadFileHandler.clearFiles(); // manually clear files after error as UFH doesn't seem to do it
                     this.progressBarFileListItem.setVisible(false);
                 });
                 // This sends 500 to browser and stop reading bytes
-                throw new IllegalArgumentException("File not supported!");
+                //throw new IllegalArgumentException("File not supported!");
+                return () -> {};
             }
             String fileName = metadata.fileName();
             byte[] bytes;
             List<DecompressedFile> decompressedFiles;
             if (this.decompressionService.isCompressedFile(fileName)) {
-                decompressedFiles = this.decompressionService.decompressFile(fileName, inputStream);
+                decompressedFiles = this.decompressionService.decompressFile(fileName, inputStream,
+                        (onError -> accessUI(() -> this.onError(onError))));
                 bytes = null;
             } else {
                 bytes = inputStream.readAllBytes();
@@ -377,7 +382,7 @@ public class Input extends Layout implements BeforeEnterObserver {
                     this.accessUI(() -> ConfirmDialogBuilder.showInformation("Validation successful!!!"));
                     return Mono.empty();
                 }))
-                .doOnError(this::onError)
+                .doOnError(onError -> this.onError(onError.getLocalizedMessage()))
                 .delayElements(Duration.ofMillis(50), Schedulers.boundedElastic())
                 .doOnTerminate(() -> {
                     log.info("Terminated!");
@@ -398,14 +403,25 @@ public class Input extends Layout implements BeforeEnterObserver {
         this.anchorDownloadErrors.setEnabled(!allErrorsList.isEmpty());
     }
 
-    private void onError(Throwable onError) {
+    private void onError(String onError) {
         this.accessUI(() -> {
-            String errorWord = onError.getLocalizedMessage();
             this.allErrorsList.add(StringUtils.LF);
-            this.allErrorsList.add(errorWord);
+            this.allErrorsList.add(onError);
             this.spanWordError = this.buildErrorSpan();
             verticalLayoutArea.add(this.spanWordError);
-            this.spanWordError.getElement().executeJs(JS_COMMAND, errorWord);
+            this.spanWordError.getElement().executeJs(JS_COMMAND, onError);
+            this.enableDownloadErrorsInOptions();
+        });
+    }
+
+    @EventListener
+    public void listener(ErrorEventRecord errorEventRecord) {
+        this.accessUI(() -> {
+            this.allErrorsList.add(StringUtils.LF);
+            this.allErrorsList.add(errorEventRecord.error());
+            this.spanWordError = this.buildErrorSpan();
+            verticalLayoutArea.add(this.spanWordError);
+            this.spanWordError.getElement().executeJs(JS_COMMAND, errorEventRecord.error());
             this.enableDownloadErrorsInOptions();
         });
     }

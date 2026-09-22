@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -38,34 +39,48 @@ import java.util.zip.ZipInputStream;
 @RequiredArgsConstructor
 public class DecompressionService {
 
+    /**
+     * An override for when we DON'T need to hear the warnings.
+     */
     public List<DecompressedFile> decompressFile(String fileName, InputStream inputStream) throws IOException {
+        return this.decompressFile(fileName, inputStream, noMessage -> {});
+    }
+
+    public List<DecompressedFile> decompressFile(String fileName, InputStream inputStream, Consumer<String> onWarning) throws IOException {
         String extension = getFileExtension(fileName).toLowerCase();
         SupportFilesEnum supportFilesEnum = SupportFilesEnum.fromExtension(extension);
         return switch (supportFilesEnum) {
-            case ZIP -> this.decompressZip(inputStream);
-            case RAR -> this.decompressRar(inputStream);
-            case FILE_7Z -> this.decompress7z(inputStream);
-            default -> throw new IllegalArgumentException("Formato no soportado: " + extension);
+            case ZIP -> this.decompressZip(inputStream, onWarning);
+            case RAR -> this.decompressRar(inputStream, onWarning);
+            case FILE_7Z -> this.decompress7z(inputStream, onWarning);
+            default -> throw new IllegalArgumentException("Unsupported format: " + extension);
         };
     }
 
     /**
-     * Descomprime archivos ZIP
+     * Unzip ZIP files
      */
-    private List<DecompressedFile> decompressZip(InputStream inputStream) throws IOException {
+    private List<DecompressedFile> decompressZip(InputStream inputStream, Consumer<String> onWarning) throws IOException {
         List<DecompressedFile> files = new CopyOnWriteArrayList<>();
 
         try (ZipInputStream zis = new ZipInputStream(inputStream);
-        final FastByteArrayOutputStream fbaos = new FastByteArrayOutputStream()) {
+             final FastByteArrayOutputStream fbaos = new FastByteArrayOutputStream()) {
             ZipEntry entry;
 
             while ((entry = zis.getNextEntry()) != null) {
-                if (!entry.isDirectory()) {
+                SupportFilesEnum supportFilesEnum = SupportFilesEnum.fromExtension(entry.getName());
+                if (!entry.isDirectory() && supportFilesEnum != SupportFilesEnum.UNKNOWN) {
                     zis.transferTo(fbaos);
                     byte[] content = fbaos.toByteArray();
                     files.add(new DecompressedFile(entry.getName(), content, entry.getSize()));
                     fbaos.reset();
                     //log.info("Descomprimido: {} ({} bytes) Thread-name: [{}]", entry.getName(), entry.getSize());
+                } else {
+                    log.warn("File ignored during upload: {}", entry.getName());
+                    if (!entry.isDirectory() && onWarning != null) {
+                        onWarning.accept("File ignored during upload: " + entry.getName());
+                    }
+
                 }
                 zis.closeEntry();
             }
@@ -75,10 +90,10 @@ public class DecompressionService {
     }
 
     /**
-     * Descomprime archivos RAR
-     * <a href="https://stackoverflow.com/a/74223706/7267818">...</a>
+     * Extract RAR files
+     * <a href="https://stackoverflow.com/a/74223706/7267818">Using java to extract .rar files [closed]</a>
      */
-    private List<DecompressedFile> decompressRar(InputStream inputStream) throws IOException {
+    private List<DecompressedFile> decompressRar(InputStream inputStream, Consumer<String> onWarning) throws IOException {
         List<DecompressedFile> files = new CopyOnWriteArrayList<>();
 
         Path tempFile = this.toTempFile(inputStream, "tempRarArchive-", SupportFilesEnum.RAR.getExtension());
@@ -90,7 +105,8 @@ public class DecompressionService {
                     ISimpleInArchive simpleInArchive = inArchive.getSimpleInterface();
 
                     for (ISimpleInArchiveItem item : simpleInArchive.getArchiveItems()) {
-                        if (!item.isFolder()) {
+                        SupportFilesEnum supportFilesEnum = SupportFilesEnum.fromExtension(item.getPath());
+                        if (!item.isFolder() && supportFilesEnum != SupportFilesEnum.UNKNOWN) {
                             ExtractOperationResult result;
                             final InputStream[] IS = new InputStream[1];
 
@@ -114,6 +130,11 @@ public class DecompressionService {
                             } else {
                                 log.error("Error extracting item: " + result);
                             }
+                        } else {
+                            log.warn("File ignored during upload: {}", item.getPath());
+                            if (!item.isFolder() && onWarning != null) {
+                                onWarning.accept("File ignored during upload: " + item.getPath());
+                            }
                         }
                     }
                 }
@@ -127,9 +148,9 @@ public class DecompressionService {
     }
 
     /**
-     * Descomprime archivos 7z
+     * Extract 7z files
      */
-    private List<DecompressedFile> decompress7z(InputStream inputStream) throws IOException {
+    private List<DecompressedFile> decompress7z(InputStream inputStream, Consumer<String> onWarning) throws IOException {
         List<DecompressedFile> files = new CopyOnWriteArrayList<>();
 
         Path tempFile = toTempFile(inputStream, "temp_7z_", SupportFilesEnum.FILE_7Z.getExtension());
@@ -140,12 +161,16 @@ public class DecompressionService {
                 SevenZArchiveEntry entry;
 
                 while ((entry = sevenZFile.getNextEntry()) != null) {
-                    if (!entry.isDirectory()) {
+                    SupportFilesEnum supportFilesEnum = SupportFilesEnum.fromExtension(entry.getName());
+                    if (!entry.isDirectory() && supportFilesEnum != SupportFilesEnum.UNKNOWN) {
                         byte[] content = new byte[(int) entry.getSize()];
                         sevenZFile.read(content);
-
                         files.add(new DecompressedFile(entry.getName(), content, entry.getSize()));
-                        //log.info("Descomprimido: {} ({} bytes)", entry.getName(), entry.getSize());
+                    } else {
+                        log.warn("File ignored during upload: {}", entry.getName());
+                        if (!entry.isDirectory() && onWarning != null) {
+                            onWarning.accept("File ignored during upload: " + entry.getName());
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -159,7 +184,7 @@ public class DecompressionService {
     }
 
     /**
-     * Obtiene la extensión del archivo
+     * Get the file extension
      */
     private String getFileExtension(String fileName) {
         int lastDot = fileName.lastIndexOf('.');
@@ -167,7 +192,7 @@ public class DecompressionService {
     }
 
     /**
-     * Lee todos los bytes de un InputStream sin cerrarlo
+     * Read all the bytes from an InputStream without closing it
      */
     private byte[] readAllBytes(InputStream inputStream) throws IOException {
         FastByteArrayOutputStream buffer = new FastByteArrayOutputStream();
