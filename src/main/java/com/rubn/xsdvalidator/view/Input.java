@@ -363,7 +363,8 @@ public class Input extends Layout implements BeforeEnterObserver {
                 .withDropLabelIcon(new Span())
                 .withDropLabel(new Span("Drop files here, only support: " + XsdValidatorConstants.SUPPORT_FILES))
                 .withUploadButton(uploadButtonAttachment)
-                .withAllowMultiple(true);
+                .withAllowMultiple(true)
+                .chooseFolders();
     }
 
     private void validateXmlInputWithXsdSchema() {

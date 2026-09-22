@@ -4,7 +4,7 @@
     <!-- Project from https://start.vaadin.com/1f51f6f0-718c-49b1-b504-75f5c5037e28 -->
     <groupId>com.rubn</groupId>
     <artifactId>xsd-validator-ui</artifactId>
-    <version>1.0.44_5-SNAPSHOT</version>
+    <version>1.0.44_6-SNAPSHOT</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>in.virit</groupId>
             <artifactId>viritin</artifactId>
-            <version>3.1.1</version>
+            <version>3.8.1</version>
         </dependency>
 
         <!--// Source - https://stackoverflow.com/a/74223706
