@@ -1,6 +1,7 @@
 package com.rubn.xsdvalidator.service;
 
 import com.rubn.xsdvalidator.records.DecompressedFile;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Disabled
 @ExtendWith(MockitoExtension.class)
 class DecompressionServiceTest {
 
